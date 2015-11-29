@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<iframe style="display: none;" name="h_iframe" width="1" height="1"></iframe>
+
+<form action="upload_images.php" method="post" name="img_upload" enctype="multipart/form-data" target="h_iframe">
+    <div id="imageId">
+     <!--   <img src="img/demo.jpg" /> -->
+        <img src="img/people.png" />
+    </div>
+    <p><input type="file" name="upload_photo" onchange="img_upload.submit();" /></p>
+</form>
+<div id="_FILES">
+
+</div>
+<div id="image_upload_status"></div>
+</body>
+</html>

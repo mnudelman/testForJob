@@ -1,0 +1,171 @@
+<!DOCTYPE>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Snake</title>
+    <link rel="stylesheet" href="styles/style.css" type="text/css" media="screen"/>
+    <link rel="Stylesheet" href="styles/menuStyle.css" type="text/css">
+    <link rel="stylesheet" href="styles/formStyle.css" type="text/css" media="screen"/>
+    <link rel="Stylesheet" href="css/sunny/jquery-ui-1.10.4.custom.css" type="text/css">
+
+    <script language="javascript" src="js/ParamSet.js"></script>
+    <script language="javascript" src="js/EnterForm.js"></script>
+    <script language="javascript" src="js/ProfileForm.js"></script>
+    <script language="javascript" src="js/RegistrationForm.js"></script>
+    <script language="javascript" src="js/TopMenu.js"></script>
+    <script language="javascript" src="js/LangControl.js"></script>
+    <script language="javascript" src="js/MainScript.js"></script>
+    <script language="javascript" src="js/Authorization.js"></script>
+    <script language="javascript" src="js/start.js"></script>
+    <script language="javascript" src="js/AjaxExecutor.js"></script>
+
+    <script language="javascript" src="lib/jquery-2.1.4.js"></script>
+    <script type="text/javascript" src="lib/jquery-ui-1.10.4.custom.js"></script>
+    <script type="text/javascript" src="lib/ajaxupload.3.5.js"></script>
+
+</head>
+<body>
+
+<div id="dbError"></div>
+
+
+<div id="navigator">
+    <ul id="nav" class="testnav">
+    <li id="userItem"><div class="clk"  id="userItem_a">
+        <img src="./images/people.png" id="menuUserPhoto" title="photo" alt="photo" style="width:20px">guest
+        </div>
+        <ul class="sub-menu">
+            <li id="userProfileItem"><a href="#" id="userProfileItem_a">profile</a></li>
+            <li id="changePasswordItem"><a href="#" id="changePasswordItem_a">change password</a></li>
+        </ul>
+    </li>
+    <li>
+        <button class="langButton"> <img src="./images/ru.png" class="imgLang" title="lang"> RU</button>
+    </li>
+    </ul>
+</div>
+
+
+<div id="welCome">
+    <h2>Welcome</h2>
+</div>
+
+
+<div id="enterDialog">
+    <button class="langButton"  style="margin-left:400px"><img src="./images/ru.png" class="imgLang" title="lang"> RU</button>
+    <div id="loginFields">
+
+        <label>
+            <span class="label"> <strong> login: </strong> </span>
+            <input type="text" id="login" class="field" value="">
+
+        </label>
+
+        <br><br>
+        <label>
+            <span class="label"> <strong> password: </strong> </span>
+            <input type="password" id="password" class="field">
+        </label> <br><br>
+    </div>
+    <div id="descriptionText">
+        <p><strong>
+
+        </strong>
+        </p>
+    </div>
+    <div id="messageText">
+        <p><strong>
+
+        </strong>
+        </p>
+    </div>
+
+</div>
+
+<!-- Р Е Г И С ТР А Ц И Я -->
+
+<div id="regDialog">
+    <button class="langButton"  style="margin-left:400px"><img src="./images/ru.png" class="imgLang" title="lang"> RU</button>
+    <div id="regLoginFields">
+        <label>
+            <span class="label"> <strong> login: </strong> </span>
+            <input type="text" id="regLogin" class="field" value="">
+        </label> <br><br>
+        <label>
+            <span class="label"> <strong> password: </strong> </span>
+            <input type="password" id="regPassword" class="field">
+        </label> <br><br>
+        <label>
+            <span class="label"> <strong> repeat password: </strong> </span>
+            <input type="password" id="regRepeatPassword" class="field">
+        </label> <br><br>
+    </div>
+    <div id="regDescriptionText">
+        <p><strong>
+
+        </strong>
+        </p>
+    </div>
+    <div id="regMessageText">
+        <p><strong>
+
+        </strong>
+        </p>
+    </div>
+
+</div>
+
+<!--    п р о ф и л ь      -->
+<div id="profDialog">
+  <!--      <h2>Profile</h2> -->
+    <button class="langButton"  style="margin-left:400px"><img src="./images/ru.png" class="imgLang" title="lang"> RU</button>
+   <div id="profPhoto">
+        <img src="./images/people.png" id="userPhoto" title="photo" alt="photo" style="width:100px">
+        &nbsp;&nbsp<button id="addPhoto">newPhoto</button>
+       <span id="status" ></span>
+   </div> <br>
+
+    <div class="form_item">
+            <label>
+            <span class="label"><strong>surname:</strong></span>
+            <span> <input class="field" type="text" id="surname"> </span> </br>
+            </label><br>
+            <label><br>
+            <span class="label"> <strong>name:</strong> </span>
+            <span> <input class="field" type="text" id="name"></span> </br>
+            </label><br>
+            <label>
+            <span class="label"> <strong>patronymic:</strong></span>
+            <span> <input class="field" type="text" id="patronymic"></span> </br>
+            </label><br>
+            <label>
+            <span class="label"><strong>e-mail:</strong>  </span>
+            <span> <input class="field1" type="email" id="e-mail"> </span></br>
+            </label>
+        </div>
+        </p>
+        <p><span class="label"><strong>sex:</strong></span>
+
+        <div class="group_item">
+            <label>
+                <input type="radio" name="sex" value="m" id="sexMan">
+                мужской </label>
+            <label>
+                <input type="radio" name="sex" value="w" id="sexWoman">
+                женский</label></br>
+        </div>
+        </p>
+        <p><span class="label"><strong>Birthday:</strong></span>
+            <input type="text" name="birthDay" id="birthday" readonly="readonly">
+        </p>
+
+        <p>
+            <strong>information about yourself:</strong> </br>
+            <textarea width=“1000px” height=“150px” name=“info” value="info" id="info"></textarea>
+        </p>
+        <div id="proMessageText"><p><strong></strong></p> </div>
+
+</div>
+
+</body>
+</html>

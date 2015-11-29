@@ -1,0 +1,90 @@
+body{
+    background-color:#f2f1f0; /*e8e38f ; /*c8c59a ; /*#7a796a ;  #F2EEA7;*/
+}
+.matrix
+{
+margin-top: 5px;
+}
+.matrixActiv {
+    border : 5px solid red;
+}
+.matrixNoActiv {
+    border:none ;
+}
+
+.cell,.cellDefault,.cellNewStart,.cellOldStart,.cellWinner,
+.headLeft,.headRight,.headUp,.headDown,.snakeBody,.target
+{
+	float: left;
+	/*width: 19px; *//*29px;*/
+	/*height:19px; *//*29px*/
+	border-bottom: 1px solid black;
+    border-right: 1px solid black;
+    background-image: url(../images/stock_weather-fog.png) ;
+    background-color: darkgrey;
+   background-size:cover;
+    /*background-size:auto;*/
+}
+.cellDefault  {
+    background-image: url(../images/stock_weather-fog.png) ;
+
+}
+.cellNewStart {
+    background-image: url(../images/start-here-gnome-circle.png) ;
+}
+.cellOldStart {
+    background-image: url(../images/start-here-gnome-green.png) ;
+}
+.cellWinner {
+    background-image: url(../images/sunny.png) ;
+}
+
+.headLeft {
+    background-image: url(../images/go-first.png) ;
+}
+.headRight {
+    background-image: url(../images/go-last.png) ;
+}
+.headUp {
+    background-image: url(../images/new-go-top.png) ;
+}
+.headDown {
+    background-image: url(../images/new-go-bottom.png) ;
+}
+.snakeBody {
+    background-image: url(../images/media-record.png) ;
+    background-repeat: no-repeat;
+    background-position: center ;
+}
+
+.target {
+    background-size: cover;
+}
+.row {
+     /*height: 20px;*/
+      /*width:210px ;*/
+    /*background-color: #6ec771;    */
+    /*heihgt:20px ;*/
+
+}
+.bt {
+    width:100px;
+    height: 40px;
+    margin:5px ;
+    border-radius: 10px;
+}
+.btPlay {
+content: 'новая игра';
+
+}
+.btStop {
+    content: 'стоп';
+
+}
+.btAuto {
+    content: 'авто';
+
+}
+.commands {
+    width: 600px ;
+}

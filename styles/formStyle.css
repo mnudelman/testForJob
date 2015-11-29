@@ -1,0 +1,140 @@
+/*  текст формы для выделения на фоновой картинке */
+.formColor{color:#0cc ; /*#0cc;*/
+ font-weight:bold ;
+}
+.label,.labelLong,.setup-label1 {
+     width: 105px; /* Ширина блока с текстом */
+     float: left; /* Расположение в одну строку с полем */
+     text-align: right; /* Выравнивание по правому краю */
+     padding-right: 5px;
+    padding-left: 2px;
+   }
+.labelLong {
+    width:140px ;
+}
+.labelForm{
+ font-weight:bold ;
+}
+.field {
+    background-color:rgb(239, 233, 233) ;
+    width: 150px;
+   }
+ /* для пароля, почты, сайта */
+ .setup-field1 {
+     width: 500px; /* Ширина поля */
+     margin-left: 10px; /* Расстояние между полем и текстом */
+     padding: 2px; /* Поля вокруг текста */
+   }
+
+
+ .field:focus,.setup-field1:focus { color:blue;
+     background: #cc9;
+   /* #ffe;  border: 1px solid #29B0D9; */
+   }
+
+
+.diagram {
+    width:300px;
+    height:27px;
+    border:1px solid blue;
+    margin-left:0 ;
+}
+#infoPart {
+    display:inline-block;
+    float:right ;
+    position: relative;
+}
+#infoForm,#statSetup,#gameSetup,#about {
+
+    width:550px;
+    height:310px;
+    border:2px solid green;
+    margin-top: 7px;
+    position: relative;
+    background-color: rgb(228, 233, 236) ;
+}
+#matrixAll {
+    display:inline-block;
+}
+#timeMarker,#speedMarker{
+    width:50px;
+    background-color: rgba(255, 138, 61, 0.70);
+
+    height:27px;
+    position:relative;
+}
+#gameCreator-bt,#gameStatistic-bt,#gameSave-bt,#stat-gameStatistic-bt{
+    width: 200px;
+    color: #AC3764;
+    height: 40px;
+    border: 1px solid #000;
+    border-radius: 10px;
+    margin-left: 5px;
+    /*position: absolute;*/
+    bottom: 20px;
+}
+
+#gameStatistic-bt,#gameSave-bt{
+    width: 150px ;
+}
+#stat-gameStatistic-bt{
+    position: absolute;
+}
+
+.gameAttr {
+    width: 100px;
+    margin-left: 310px;
+    margin-top: -27px;
+    position: absolute;
+    background-color:rgb(239, 233, 233) ;
+}
+#maxSpeed {
+    width: 100px;
+    }
+table {
+    border: 1px solid #399; /* Граница вокруг таблицы */
+    border-spacing: 0 ; /* Расстояние между границ */
+}
+td,th {
+    background: #F0ECDC;; /* Цвет фона */
+    border: 1px solid #333; /* Граница вокруг ячеек */
+    padding: 1px; /* Поля в ячейках */
+}
+th {
+    background: #c3c3af;; /* Цвет фона */
+}
+th:hover {
+    font-style: italic;
+}
+.inputSelect{
+    position:fixed ;
+    background-color:rgb(239, 233, 233) ;
+    z-index: 100 ;
+    width:203px ;
+    margin-left: 105px ;
+}
+.markerText {
+    width:60px ;
+    margin-left:125px ;
+    color: #0000ff;
+    font-style: oblique;
+    font-weight:bold;
+}
+.setup-label1 {
+    width: 130px;
+}
+
+.setup-field1 {
+    width: 100px;
+    font-size: 15px;
+    background-color:rgb(239, 233, 233) ;
+}
+
+.setup-slider {
+    width: 300px;
+    margin-left: 10px;
+    display: inline-block;
+}
+#calculateDialog {
+    width : 400px ;
+}
