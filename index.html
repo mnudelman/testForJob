@@ -2,7 +2,7 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
-    <title>Snake</title>
+    <title>Test</title>
     <link rel="stylesheet" href="styles/style.css" type="text/css" media="screen"/>
     <link rel="Stylesheet" href="styles/menuStyle.css" type="text/css">
     <link rel="stylesheet" href="styles/formStyle.css" type="text/css" media="screen"/>
@@ -10,19 +10,20 @@
 
     <script language="javascript" src="js/ParamSet.js"></script>
     <script language="javascript" src="js/EnterForm.js"></script>
+    <script language="javascript" src="js/EnterFormLangModule.js"></script>
     <script language="javascript" src="js/ProfileForm.js"></script>
     <script language="javascript" src="js/RegistrationForm.js"></script>
     <script language="javascript" src="js/TopMenu.js"></script>
     <script language="javascript" src="js/LangControl.js"></script>
     <script language="javascript" src="js/MainScript.js"></script>
     <script language="javascript" src="js/Authorization.js"></script>
+    <script language="javascript" src="lib/jquery-2.1.4.js"></script>
+
     <script language="javascript" src="js/start.js"></script>
     <script language="javascript" src="js/AjaxExecutor.js"></script>
 
-    <script language="javascript" src="lib/jquery-2.1.4.js"></script>
     <script type="text/javascript" src="lib/jquery-ui-1.10.4.custom.js"></script>
     <script type="text/javascript" src="lib/ajaxupload.3.5.js"></script>
-
 </head>
 <body>
 
@@ -55,15 +56,15 @@
     <button class="langButton"  style="margin-left:400px"><img src="./images/ru.png" class="imgLang" title="lang"> RU</button>
     <div id="loginFields">
 
-        <label>
-            <span class="label"> <strong> login: </strong> </span>
+        <label >
+            <span class="label" id="loginLabel"> <strong> login: </strong> </span>
             <input type="text" id="login" class="field" value="">
 
         </label>
 
         <br><br>
         <label>
-            <span class="label"> <strong> password: </strong> </span>
+            <span class="label" id="passwordLabel"> <strong> password: </strong> </span>
             <input type="password" id="password" class="field">
         </label> <br><br>
     </div>
@@ -166,6 +167,10 @@
         <div id="proMessageText"><p><strong></strong></p> </div>
 
 </div>
+
+
+
+
 
 </body>
 </html>

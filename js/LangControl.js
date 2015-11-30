@@ -17,6 +17,10 @@ function LangControl() {
             currentLang = (currentLang == paramSet.LANG_RU) ? paramSet.LANG_EN : paramSet.LANG_RU ;
             paramSet.currentLang = currentLang ;
             showButton() ;
+            var currentForm = paramSet.currentForm ;
+            if (typeof(currentForm) == 'object' ) {
+                currentForm.formShow() ;
+            }
         }) ;
     } ;
     /**

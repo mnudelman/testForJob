@@ -8,19 +8,20 @@ function EnterForm() {
     var registrationForm ;  // регистрация
     var profileForm  ;      // профиль
 
-    // --- объекты jQuery ввода пароля
+    // ---  объекты jQuery ввода пароля
     var $loginElem = $('#login');
     var $passwordElem = $('#password');
     var $descriptionText = $('#descriptionText');
     var $messageText = $('#messageText');
-    var $DESCRIPTION_TEXT = 'Для ознакомления с работой сайта нажмите<strong> <I> "guest" </I></strong> или<strong> <I>Esc</I></strong> <br>' +
-        'Если Вы зарегистрированный пользователь заполните  поля <strong><I>login,password</I></strong> ' +
-        'и нажмите <strong><I>"enter"</I> </strong> <br>' +
-        'Если вы хотите пройти регистрацию, то нажмите<strong> <I> "new name"</I> </strong> ';
 
     var USER_TYP_GUEST = 'guest';
     var USER_TYP_USER = 'user';
     this.currentDialog = $('#enterDialog') ;
+    var readyStat = '' ;                   // состояние готовности (определяет набор командных кнопок)
+    var STAT_INIT = 'init' ;        // начальное состояние
+    var STAT_GUEST = 'guest' ;      // определён как гость
+    var STAT_USER = 'user' ;        // определён как пользователь
+    this.langModule = new EnterFormLangModule() ;     // языковый модуль формы
     var _this = this;
 
     // атрибуты авторизации
@@ -32,45 +33,23 @@ function EnterForm() {
         guest: true,
         successful: false
     };
-    this.nextStep = '' ;    // следующий шаг авторизации
+
 
     // открыть
     // ---------------------
     this.edit = function () {
+        // формы автризации
         registrationForm = paramSet.registrationForm;  // регистрация
         profileForm  = paramSet.profileForm ;          // профиль
 
-
-
+        paramSet.currentForm = _this ;                // сохраняем текущую форму
+        readyStat = STAT_INIT ;                       // начальное состояние
         $('#enterDialog').dialog({
             title: 'authorization',
             width: 500,
             modal: true,
-            buttons: [
-                {
-                    text: "guest",
-                    click: function () {
-                        EnterFormClick(false, true, USER_TYP_GUEST);
-                    }
-                },
-                {
-                    text: "enter",
-                    click: function () {
-                        EnterFormClick(false, false, USER_TYP_USER);
-                    }
-                },
-                {
-                    text: "new name",
-                    click: function () {
-                        _this.currentDialog.dialog('close');
-                        //var regForm = new RegistrationForm() ;
-                        // var regForm = aunew RegistrationForm() ;
-                        registrationForm.edit();
-                        // regForm.edit() ;
-                    }
-                }
-            ],
             beforeClose: function (event, ui) {
+                paramSet.currentForm = '' ;            // чистить форму
 
                 var name = authorizationVect['login'];
                 if (name.length == 0) {
@@ -84,10 +63,7 @@ function EnterForm() {
             }
         }) ;
 
-        $descriptionText.empty();
-        $descriptionText.append($DESCRIPTION_TEXT);
-        $descriptionText.css({'border': ' 2px solid green'});
-
+        _this.formShow() ;        // выводит элементы по текущему языку
         $messageText.empty();
 
         $("#login").autocomplete({
@@ -106,6 +82,78 @@ function EnterForm() {
             minLength: 0
         });
     };
+
+    /**
+     * вычисляет набор командных кнопок в зависимости от полноты заполнения
+     */
+    var  commandSet = function() {
+        var langMod = _this.langModule ;
+        var lang = paramSet.currentLang ;
+        lang = lang.toLowerCase() ;
+        var cmdTab = langMod.cmdTab ;
+        var cmdName = cmdTab['cmdGuest'][lang] ;
+        var cmdGuest ={
+            text: cmdName,                                        // "guest",
+            click: function () {
+                EnterFormClick(false, true, USER_TYP_GUEST);
+            }
+        } ;
+        cmdName = cmdTab['cmdEnter'][lang] ;
+        var cmdEnter =  {
+            text: cmdName,                                        // "enter",
+            click: function () {
+                EnterFormClick(false, false, USER_TYP_USER);
+            }
+        } ;
+        cmdName = cmdTab['cmdNewName'][lang] ;
+        var cmdNewName = {
+            text: cmdName,                                        // "new name",
+            click: function () {
+                _this.currentDialog.dialog('close');
+                registrationForm.edit();
+            }
+        } ;
+        cmdName = cmdTab['cmdOk'][lang] ;
+        var cmdOk = {
+            text: cmdName,                                        // "oK!",                        // для гостя только ok!
+            click: function () {
+                $('#enterDialog').dialog("close");
+
+            }
+        } ;
+        cmdName = cmdTab['cmdProfile'][lang] ;
+        var cmdProfile = {
+            text: cmdName,                                        // "profile show/edit",      // добавляется кнопка перехода в профиль
+            click: function () {
+                $('#enterDialog').dialog("close");
+                profileForm.edit();
+
+            }
+        } ;
+//  командные кнопки в зависимости от состояния
+        var curDialog = _this.currentDialog ;
+        switch(readyStat) {
+            case STAT_INIT :
+            $(curDialog).dialog("option", "buttons", [
+                cmdGuest, cmdEnter, cmdNewName
+            ]) ;
+
+                break ;
+            case STAT_GUEST :
+                $(curDialog).dialog("option", "buttons", [
+                    cmdOk
+                ]) ;
+
+                break ;
+            case STAT_USER :
+                $(curDialog).dialog("option", "buttons", [
+                    cmdOk, cmdProfile
+                ]) ;
+                break ;
+        }
+
+    } ;
+
 
     var EnterFormClick = function (newNameFlag, guestFlag, userTyp) {
         authorizationVect['newName'] = newNameFlag;
@@ -162,11 +210,6 @@ function EnterForm() {
 
         }
 
-
-
-
-
-
     } ;
     /**
      * Нажата кнопка формы
@@ -176,73 +219,71 @@ function EnterForm() {
      */
     var enterReady = function(ready,message,userTyp) {
         $messageText.empty();
-       if (ready) {
+        if (ready) {
             $descriptionText.empty() ;
             $messageText.css({'border': ' 2px solid blue', 'color': 'blue'});
             $messageText.append(message);
 
 // переопределяем кнопки при отсутствии ошибок
             if (userTyp == USER_TYP_GUEST) {
+
+                $('#loginFields').empty() ;
+                readyStat = STAT_GUEST ;
+                commandSet() ;
             }
-           if (userTyp == USER_TYP_USER) {
-               var topMenu = paramSet.topMenu;       // модуль вывода меню
-               // читаем profile
-               profileForm.getProfile();     // profile в paramSet - запускает чтение profile
-               var tmpTimer = setInterval(function () {
-                   var isReady = profileForm.isRequestReady();  // готовность запроса
-                   if (true == isReady) {
-                       clearInterval(tmpTimer);
-                       profileForm.profileAccess();     // доступ к profile через paramSet
-                       topMenu.showUser();              // показать пользователя
-
-                       $('#loginFields').empty() ;
-                       $('#enterDialog').dialog("option", "buttons", [
-                           {
-                               text: "oK!",                        // для гостя только ok!
-                               click: function () {
-                                   $('#enterDialog').dialog("close");
-
-                               }
-                           }
-                       ]);
-
+            if (userTyp == USER_TYP_USER) {
+                var topMenu = paramSet.topMenu;       // модуль вывода меню
+                // читаем profile
+                profileForm.getProfile();     // profile в paramSet - запускает чтение profile
+                var tmpTimer = setInterval(function () {
+                    var isReady = profileForm.isRequestReady();  // готовность запроса
+                    if (true == isReady) {
+                        clearInterval(tmpTimer);
+                        profileForm.profileAccess();     // доступ к profile через paramSet
+                        topMenu.showUser();              // показать пользователя
                    }
-               }, 300);
+                }, 300);
 
+                readyStat = STAT_USER ;
 
-
-
-
-
-               $loginElem.attr('readonly','readonly') ;
-               $passwordElem.attr('readonly','readonly') ;
-               $('#enterDialog').dialog("option", "buttons", [
-                   {
-                       text: "oK!",
-                       click: function () {
-                           $('#enterDialog').dialog("close");
-
-                       }
-                   },
-                   {
-                       text: "profile show/edit",      // добавляется кнопка перехода в профиль
-                       click: function () {
-
-                           alert('profileEditSelect') ;
-
-                           $('#enterDialog').dialog("close");
-                           profileForm.edit() ;
-
-                       }
-                   }
-               ]);
-           }
+                $loginElem.attr('readonly','readonly') ;
+                $passwordElem.attr('readonly','readonly') ;
+                commandSet() ;
+            }
 
         } else {
             $messageText.css({'border': ' 2px solid red', 'color': 'red'});
             $messageText.append(message);
         }
 
+    } ;
+     this.formShow = function() {
+        var lang = paramSet.currentLang ;
+        lang = lang.toLowerCase() ;
+        var langMod = _this.langModule ;
+        var titleTab = langMod.titleTab ;
+        var fieldTab = langMod.fieldTab ;
+        var cmdTab = langMod.cmdTab ;
+        var messageTab = langMod.messageTab ;
+        var title = titleTab[lang] ;
+        showTitle(title) ;
+        for (var fldId in fieldTab) {
+            var fldName = fieldTab[fldId][lang] ;
+            fieldShow(fldId,fldName) ;
+        }
+        commandSet() ;
+        var descript = messageTab['description'][lang] ;
+        $descriptionText.empty();
+        $descriptionText.append( descript);
+        $descriptionText.css({'border': ' 2px solid green'});
+    } ;
+
+    var fieldShow = function(fldId,fldName) {
+        $('#'+fldId).text(fldName) ;
+    } ;
+
+    var showTitle = function(title) {
+        _this.currentDialog.dialog('option','title',title) ;
     }
 
 }

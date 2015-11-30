@@ -38,6 +38,7 @@ function ParamSet() {
     this.LANG_IMG_RU ;               // пиктограмма языка
     this.LANG_IMG_EN ;
     this.currentLang = 'RU' ;        // текущий язык(начальное значение)
+    this.currentForm = '' ;          // текущая активная форма
     //------------------------------------------ //
     var _this = this ;
 
