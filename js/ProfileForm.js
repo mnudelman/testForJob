@@ -23,6 +23,7 @@ function ProfileForm(authorizationObj) {
         'filePhoto': {'val': '','field' : $('#addPhoto')}
     } ;
     var $messageText = $('#proMessageText') ;
+    var $emailField = $('#e-mail') ;
     var userLogin  ;
     var profileImport = {} ;    // массив для импорта профиля
     var requestReady = false ;  // флаг завершения запроса
@@ -93,6 +94,19 @@ function ProfileForm(authorizationObj) {
             $('#sexMan').removeAttr('checked') ;
             $('#sexWoman').attr('checked',"checked") ;
         }) ;
+  //////////////////////////////////////////////////////////
+
+        $emailField.blur(function(){
+            $messageText.empty() ;
+            var val = $emailField.val() ;
+            if (val.indexOf('@') <= 0 ) {
+                var messages = [] ;
+                messages[0] = 'Должен быть обязательный символ "@" ' ;
+                var err = true ;
+                messageOut('e-mail',err,messages) ;
+            }
+        }) ;
+
 
         commandSet();       // командные кнопки
 

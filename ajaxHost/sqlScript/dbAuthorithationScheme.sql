@@ -3,7 +3,7 @@
 -- CREATE DATABASE IF NOT EXISTS authorization ;
 -- --------------------------------------
 -- users - список пользователей
-drop table users ;
+--drop table users ;
 CREATE TABLE IF NOT EXISTS users (
   userid   INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
   login    VARCHAR(20) UNIQUE,
@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS users (
 )DEFAULT CHARSET=utf8 ;
 -- --------------------------------------
 -- userprofile - Профиль пользователя
-drop table userprofile ;
+--drop table userprofile ;
 CREATE TABLE IF NOT EXISTS userprofile (
   id         INTEGER NOT NULL  AUTO_INCREMENT PRIMARY KEY,
   userid     INTEGER

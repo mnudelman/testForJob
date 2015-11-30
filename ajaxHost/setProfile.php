@@ -44,7 +44,8 @@ class Db_setprofile extends Db_base
                ' WHERE id = :id'  ;
         $subst = ['id' => $id];
         $result = $this->sqlExecute($sql, $subst, __METHOD__);
-        if (false === $result || 0 === $result ) {
+        //if (false === $result || 0 === $result ) {
+            if (false === $result ) {
             return [
                 'successful' => false,
                 'sql' => $sql,
@@ -55,7 +56,7 @@ class Db_setprofile extends Db_base
         return ['successful' => true,
                  'sql' => $sql,
                  'subst' => $subst,
-                 'rofile' => $profile,
+                 'profile' => $profile,
                 'result' => $result ] ;
     }
 }

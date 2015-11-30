@@ -19,6 +19,9 @@
     background-color:rgb(239, 233, 233) ;
     width: 150px;
    }
+.field1 {
+    background-color:rgb(239, 233, 233) ;
+}
  /* для пароля, почты, сайта */
  .setup-field1 {
      width: 500px; /* Ширина поля */
@@ -27,7 +30,7 @@
    }
 
 
- .field:focus,.setup-field1:focus { color:blue;
+ .field:focus,.setup-field1:focus,.field1:focus { color:blue;
      background: #cc9;
    /* #ffe;  border: 1px solid #29B0D9; */
    }

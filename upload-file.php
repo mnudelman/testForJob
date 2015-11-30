@@ -18,8 +18,8 @@ $ext = $pInfo['extension'] ;
 
 $filetypes = array('.jpg','.gif','.bmp','.png','.JPG','.BMP','.GIF','.PNG','.jpeg','.JPEG');
  
-if(!in_array($ext,$filetypes)){
-	echo "<p>-----не допустимое расширение файла----</p>";}
+if(!in_array('.'.$ext,$filetypes)){
+	echo "<p>-----не допустимое расширение файла----</p>".$ext;}
 else{ 
 	if (move_uploaded_file($_FILES['uploadfile']['tmp_name'], $file)) { 
 	  echo "success"; 
