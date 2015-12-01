@@ -15,9 +15,17 @@
  Реализация.
         сайт:     http://mnudelman.xyz/testForJob
         тексты: https://github.com/mnudelman/testForJob
+        настоящая аннотация: https://github.com/mnudelman/testForJob/tree/master/annotation
+
+        Схема БД в папке /dbDump.
+        К двум таблицам users, userprofile добавлен триггер, добавляющий строку в userprofile одновременно с
+        добавлением в users. Поле users.login объявлено UNIQUE. Поэтому оно индексируется. Используется в
+        для обеспечения автозаполнения.
+
 
        Схема проекта.
        ajaxHost     -  php - тексты, обеспечивающие взаимодействие с БД
+       dbDump       - дамп БД
        css          - css - файлы пакета jquery-ui
        images       - картинки, используемые в проекте
        js           - JS - скрипты
