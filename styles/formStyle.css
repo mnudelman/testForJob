@@ -35,6 +35,18 @@
    /* #ffe;  border: 1px solid #29B0D9; */
    }
 
+.messageInfo, .messageError {
+    border: 2px solid #000;
+    border-radius: 5px;
+}
+.messageInfo {
+    border-color: #00a300;
+    color: #00b3ee;
+}
+.messageError {
+    border-color: #990000 ;
+    color : #ff0000;
+}
 
 .diagram {
     width:300px;

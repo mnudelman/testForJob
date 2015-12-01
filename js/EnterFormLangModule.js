@@ -24,6 +24,18 @@ function EnterFormLangModule() {
             'If You are a registered user fill out the fields: <strong><I>login,password</I></strong> ' +
             'and click <strong><I>"Enter"</I> </strong> <br>' +
             'If you wish to check, click<strong> <I> "New name"</I> </strong> '
+        },
+        'loggedAsGuest' : {
+            'ru': 'ИНФО:Вы вошли на сайт как ГОСТЬ(только просмотр)',
+            'en': 'INFO:you are logged in as a GUEST(show only)'
+        },
+        'fieldsMustBeFilled' :{
+            'ru':'ОШИБКА: поля "логин","пароль" должны быть заполнены.' ,
+            'en': 'ERROR: Fields "login","password" must be filled.'
+        },
+        'noAnswerFromDB' :{
+            'ru':'ОШИБКА: Нет ответа от базы данных.' ,
+            'en': 'ERROR: No answer from the database.'
         }
     } ;
 }

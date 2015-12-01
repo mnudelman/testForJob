@@ -13,6 +13,13 @@ function EnterForm() {
     var $passwordElem = $('#password');
     var $descriptionText = $('#descriptionText');
     var $messageText = $('#messageText');
+    var currentMessage = {                  // текущее сообщение(нужно при обновлении формы)
+        'id' : '',
+        'error' : false,
+        'textDirect' : false                // true - прямое задание текста(от БД), иначе через таблицу
+        } ;
+    var MESSAGE_ERROR_CSS = 'messageError' ;   //  класс для вывода ошибок
+    var MESSAGE_INFO_CSS = 'messageInfo' ;     //  класс для вывода информационных сообщений
 
     var USER_TYP_GUEST = 'guest';
     var USER_TYP_USER = 'user';
@@ -169,21 +176,24 @@ function EnterForm() {
 
             paramSet.setUser(authorizationVect);           // сохранить профиль
 
-            message = 'INFO:Вы вошли на сайт как ГОСТЬ' ;
+            var error = false ;
+            messageShow('loggedAsGuest',error) ;      // 'INFO:Вы вошли на сайт как ГОСТЬ' ;
             ready = true;
             enterReady(ready,message,userTyp) ;
         } else {
             var log = authorizationVect['login'];
             var passw = authorizationVect['password'];
             if (log.length == 0 || passw.length == 0) {
-                message = 'ERROR:поля login,password должны быть заполнены!';
+                messageShow('fieldsMustBeFilled',error = true) ;      // ''ERROR:поля login,password должны быть заполнены!';' ;
             } else {
 
                 ajaxExecute.getData(authorizationVect, true);
                 var tmpTimer = setInterval(function () {
                     var answ = ajaxExecute.getRequestResult();
                     if (false == answ || undefined == answ) {
-                        message = 'ERROR:Нет ответа от БД';
+                        messageShow('noAnswerFromDB',error = true) ;      // 'ERROR:Нет ответа от БД';
+
+
                         ready = false;
                     } else {
                         clearInterval(tmpTimer);
@@ -219,11 +229,10 @@ function EnterForm() {
      */
     var enterReady = function(ready,message,userTyp) {
         $messageText.empty();
+        var error ;
+        var directText ;
         if (ready) {
-            $descriptionText.empty() ;
-            $messageText.css({'border': ' 2px solid blue', 'color': 'blue'});
-            $messageText.append(message);
-
+            messageShow(message,error = false,directText = true) ;      // ответ БД
 // переопределяем кнопки при отсутствии ошибок
             if (userTyp == USER_TYP_GUEST) {
 
@@ -252,14 +261,13 @@ function EnterForm() {
             }
 
         } else {
-            $messageText.css({'border': ' 2px solid red', 'color': 'red'});
-            $messageText.append(message);
+            messageShow(message,error = true,directText = true) ;      // ответ БД - прямой текст
         }
 
     } ;
      this.formShow = function() {
-        var lang = paramSet.currentLang ;
-        lang = lang.toLowerCase() ;
+        var lang = paramSet.currentLang.toLowerCase() ;
+       // lang = lang.toLowerCase() ;
         var langMod = _this.langModule ;
         var titleTab = langMod.titleTab ;
         var fieldTab = langMod.fieldTab ;
@@ -275,7 +283,12 @@ function EnterForm() {
         var descript = messageTab['description'][lang] ;
         $descriptionText.empty();
         $descriptionText.append( descript);
-        $descriptionText.css({'border': ' 2px solid green'});
+         $descriptionText.removeClass() ;
+         $messageText.addClass(MESSAGE_INFO_CSS) ;
+         if(currentMessage['id'].length > 0) {            // перевывод текущего сообщения
+             messageShow(currentMessage['id'],currentMessage['error'],currentMessage['directText']) ;
+         }
+//        $descriptionText.css({'border': ' 2px solid green'});
     } ;
 
     var fieldShow = function(fldId,fldName) {
@@ -284,6 +297,32 @@ function EnterForm() {
 
     var showTitle = function(title) {
         _this.currentDialog.dialog('option','title',title) ;
+    } ;
+    var messageShow = function(messageId,error,directText) {
+        currentMessage['id'] = messageId ; // запомнить тек сообщение
+        currentMessage['error']= error ;
+
+        directText = (typeof(directText) !== 'boolean') ? false : directText ;
+        currentMessage['directText']= directText ;
+        var langMod = _this.langModule ;
+        var message = '' ;
+        if (directText) {
+            message = messageId ;      // прямой текст
+        }else {
+            var lang = paramSet.currentLang.toLowerCase();
+            var messageTab = langMod.messageTab;
+            message = (typeof(messageTab[messageId][lang]) !== 'string') ? messageId : messageTab[messageId][lang];
+        }
+        var cssClass = (error) ? MESSAGE_ERROR_CSS : MESSAGE_INFO_CSS ;
+        $messageText.empty() ;
+        $messageText.removeClass() ;
+        $messageText.addClass(cssClass) ;
+        $messageText.append(message) ;
+    } ;
+    var messageClear = function() {
+        currentMessage = '' ;
+        $messageText.empty() ;
+        $messageText.removeClass() ;
     }
 
 }
