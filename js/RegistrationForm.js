@@ -47,6 +47,7 @@ function RegistrationForm(authorizationObj) {
         successful: false
     };
     this.currentDialog =  $('#regDialog') ;
+    this.langModule = new RegistrationFormLangModule() ;     // языковый модуль формы
 
    // открыть
     // ---------------------
@@ -212,6 +213,10 @@ function RegistrationForm(authorizationObj) {
      */
     var dbValidate = function() {
         var error = false ;
+        var messages = [] ;
+        var messI = 0 ;
+        var subst = {} ;
+        var directText = false ;
         for (var key in fieldErrors) {              // ошибки заполнения
             error = error || fieldErrors[key] ;
         }
@@ -225,6 +230,8 @@ function RegistrationForm(authorizationObj) {
         authorizationVect['password'] = $passwordElem.val();
         ajaxExecute.getData(authorizationVect, true);
         var message = '' ;
+        var fldName = '' ;
+        var subst = {} ;
         var tmpTimer = setInterval(function () {
             var answ = ajaxExecute.getRequestResult();
             if (false == answ || undefined == answ) {
@@ -248,18 +255,19 @@ function RegistrationForm(authorizationObj) {
                 }
          }
             if (regSuccessful) {
-                successfulMessage() ;    // сообщение об  успехе
+                messages[messI++] = 'registrationIsCompleted' ; // сообщение об  успехе
+                messagesShow(fldName = '',error=false,messages) ;
+
                 $loginElem.attr('readonly','readonly') ;
                 $passwordElem.attr('readonly','readonly') ;
                 $passwordDublElem.attr('readonly','readonly') ;
                 // обновить меню //
                  var topMenu = paramSet.topMenu ;
                 topMenu.showUser() ;
-            }else {
-                var err = !regSuccessful ;
-                var messages = [] ;
+            }else {                         // сообщения БД прямой текст
+                var err = true ;
                 messages[0] = message ;
-                messageOut('login',err,messages) ;
+                messagesShow(fldName = 'login',err,messages,subst,directText = true) ;
                 $loginElem.removeAttr('readonly') ;
                 $loginElem.focus() ;
             }
@@ -269,7 +277,7 @@ function RegistrationForm(authorizationObj) {
     } ;
     /**
      *  проверяет допустимость заполнения конкретного поля
-     *  формирует сообщение об ошибке
+     *  формирует массив сообщений об ошибках
      * @param fldName          -  имя поля
      * @param fldVal           - значение
      * @param lengthMin        - мин число символов
@@ -286,10 +294,14 @@ function RegistrationForm(authorizationObj) {
         var errorMessage = '' ;
         var letterFlag = false ;     // наличие буквы
         var digitFlag = false ;      // наличие цифры
+        var directText = false ;     // прямой текст без перевода
+        var subst = {} ;             // вектор подстановок
         var br = '<br>' ;
         if (val.length < lengthMin || val.length > lengthMax) {
             error = true ;
-            messages[messI++] = 'Длина поля должна быть в интервале: от '+ lengthMin+ ' до '+lengthMax ;
+            subst['lengthMin'] = lengthMin ;
+            subst['lengthMax'] = lengthMax ;
+            messages[messI++] = 'fieldLengthRange' ; // 'Длина поля должна быть в интервале: от '+ lengthMin+ ' до '+lengthMax ;
         }
 
         for (var i = 0; i < val.length ; i++) {
@@ -306,20 +318,37 @@ function RegistrationForm(authorizationObj) {
         if (letterDigitFlag) {       // наличие буквы - цыфры
             if (!(letterFlag && digitFlag)) {
                 error = true ;
-                var mess = 'Обязательно наличие одной буквы и одной цифры.' ;
-                messages[messI++] = mess + br ;
+                // 'Обязательно наличие одной буквы и одной цифры.' ;
+                messages[messI++] = 'obligatoryPresenceLetterDigit' ;
             }
         }
         if (errorSymbols.length > 0) {
-            message[messI++] = 'Недопустимые символы:  ' + errorSymbols;
+            // 'Недопустимые символы:  ' + errorSymbols;
+            subst['errorSymbols'] = errorSymbols ;
+            message[messI++] = 'invalidCharacters' ;
         }
-        messageOut(fldName,error,messages) ;
+        messagesShow(fldName,error,messages,subst) ;
         return error ;
     } ;
-    var messageOut = function(fldName,error,messages) {
+    var messagesShow = function(fldName,error,messages,subst,directText) {
+        var lang = paramSet.currentLang.toLowerCase() ;
+        // lang = lang.toLowerCase() ;
+        var langMod = _this.langModule ;
+        var messageTab = langMod.messageTab ;
+
+        var TextOut = '' ;
         var br = '<br>' ;
-        $messageText.empty() ;
+        var messageLine = '' ;
+
+
+
+
+
+
+
+       
         if (error) {
+
             var errorMessage = 'поле:<strong>' + fldName +'</strong> ошибки заполнения.'+br ;
             for (var i = 0 ; i < messages.length ; i++) {
                 errorMessage += messages[i]+br ;
@@ -331,14 +360,99 @@ function RegistrationForm(authorizationObj) {
         }
 
     } ;
+    /**
+     * Построить строку сообщений
+     * в строке возможны подстановки вида '{parameter}'
+     * @param message   - текст
+     * @param subst     - вектор подстановок
+     */
+    var messageLineBuild = function(message,subst) {
+        while (message.indexOf('{') >= 0 )
+        {
+            var posBeg = message.indexOf('{');
+            var posEnd = message.indexOf('}');
+            if (posBeg >=0 && posEnd >= 0) {
+                var param = message.substr(posBeg,posEnd - posBeg +1) ;
+                param = param.substr(1,param.length - 2) ;
+                if (typeof(subst[param]) !== undefined ) {
+                    var val = subst[param] ;
+                    var leftPart = message.substr(0,posBeg - 1) ;
+                    var rightPart = message.substr(posEnd +1) ;
+                    message = leftPart + val + rightPart ;
+                }
+            }
+        }
+        return message ;
+    } ;
     var successfulMessage = function() {
         $messageText.empty() ;
+
         var mess = 'oK! Регистрация выполнена. <br> ' +
                    'Можете перейти к заполнению профиля или сделать это позднее' ;
         $messageText.css({'border': ' 2px solid blue', 'color': 'blue'}) ;
 
         $messageText.append(mess);
 
+    } ;
+    this.formShow = function() {
+        var lang = paramSet.currentLang.toLowerCase() ;
+        // lang = lang.toLowerCase() ;
+        var langMod = _this.langModule ;
+        var titleTab = langMod.titleTab ;
+        var fieldTab = langMod.fieldTab ;
+        var cmdTab = langMod.cmdTab ;
+        var messageTab = langMod.messageTab ;
+        var title = titleTab[lang] ;
+        showTitle(title) ;
+        for (var fldId in fieldTab) {
+            var fldName = fieldTab[fldId][lang] ;
+            fieldShow(fldId,fldName) ;
+        }
+        commandSet() ;
+        var descript = messageTab['description'][lang] ;
+        $descriptionText.empty();
+        $descriptionText.append( descript);
+        $descriptionText.removeClass() ;
+        $messageText.addClass(MESSAGE_INFO_CSS) ;
+        if(currentMessage['id'].length > 0) {            // перевывод текущего сообщения
+            messagesShow(currentMessage['id'],currentMessage['error'],currentMessage['directText']) ;
+        }
+//        $descriptionText.css({'border': ' 2px solid green'});
+    } ;
+
+    var fieldShow = function(fldId,fldName) {
+        $('#'+fldId).text(fldName) ;
+    } ;
+
+    var showTitle = function(title) {
+        _this.currentDialog.dialog('option','title',title) ;
+    } ;
+    var messageShow = function(messageId,error,directText) {
+        currentMessage['id'] = messageId ; // запомнить тек сообщение
+        currentMessage['error']= error ;
+
+        directText = (typeof(directText) !== 'boolean') ? false : directText ;
+        currentMessage['directText']= directText ;
+        var langMod = _this.langModule ;
+        var message = '' ;
+        if (directText) {
+            message = messageId ;      // прямой текст
+        }else {
+            var lang = paramSet.currentLang.toLowerCase();
+            var messageTab = langMod.messageTab;
+            message = (typeof(messageTab[messageId][lang]) !== 'string') ? messageId : messageTab[messageId][lang];
+        }
+        var cssClass = (error) ? MESSAGE_ERROR_CSS : MESSAGE_INFO_CSS ;
+        $messageText.empty() ;
+        $messageText.removeClass() ;
+        $messageText.addClass(cssClass) ;
+        $messageText.append(message) ;
+    } ;
+    var messageClear = function() {
+        currentMessage = '' ;
+        $messageText.empty() ;
+        $messageText.removeClass() ;
     }
+
 }
 
