@@ -47,18 +47,18 @@ function RegistrationForm(authorizationObj) {
         successful: false
     };
     this.currentDialog =  $('#regDialog') ;
-    this.nextStep = '' ;        // след шаг авторизации
+
    // открыть
     // ---------------------
     this.edit = function () {
         profileForm  = paramSet.profileForm ;          // профиль
-        this.nextStep = 'registrationForm' ;        // чистить
-
+        paramSet.currentForm = _this ;                // сохраняем текущую форму
         $('#regDialog').dialog({
             title: 'registration',
             width: 500,
             modal: true,
             beforeClose: function (event, ui) {
+                paramSet.currentForm = '' ;                // текущую форма - пусто
                 var name = authorizationVect['login'];
                 if (!regSuccessful) {
                     authorizationVect['login'] = 'noName';
