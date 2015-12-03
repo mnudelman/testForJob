@@ -31,17 +31,39 @@ function RegistrationFormLangModule() {
             'symbols and no more <strong>20</strong> symbols<br>'+
             'your password should be at least  <strong>one letter</strong> and at least<strong>one digit</strong>'
         },
-        'loggedAsGuest' : {
-            'ru': 'ИНФО:Вы вошли на сайт как ГОСТЬ(только просмотр)',
-            'en': 'INFO:you are logged in as a GUEST(show only)'
+        'fieldLengthRange' : {
+            'ru': 'ОШИБКА: Длина поля(число символов) в интервале <strong>от {lengthMin} до {lengthMax}</strong>',
+            'en': 'ERROR: Field length(number of characters) in the range <strong>from {lengthMin} to {lengthMax}</strong>'
         },
         'fieldsMustBeFilled' :{
-            'ru':'ОШИБКА: поля "логин","пароль" должны быть заполнены.' ,
-            'en': 'ERROR: Fields "login","password" must be filled.'
+            'ru':'ОШИБКА: поля <strong>"логин","пароль"</strong> должны быть заполнены.' ,
+            'en': 'ERROR: Fields <strong>"login","password"</strong> must be filled.'
         },
         'noAnswerFromDB' :{
             'ru':'ОШИБКА: Нет ответа от базы данных.' ,
             'en': 'ERROR: No answer from the database.'
+        },
+        'registrationCompleted' :{
+            'ru' : 'oK! Регистрация выполнена<br> ' +
+                    'Можете перейти к <strong>заполнению профиля</strong> или сделать это позднее' ,
+            'en' : 'oK! The registration is completed.<br>'+
+                    'Can go to the <strong>profile</strong> or to do it later'
+        } ,
+        'obligatoryPresenceLetterDigit' : {
+            'ru' : 'ОШИБКА: В пароле должна быть хотя бы <strong>одна буква</strong> и хотя бы <strong>одна цифра</strong>',
+            'en' : 'ERROR: Your password should be at least  <strong>one letter</strong> and at least<strong>one digit</strong>'
+        } ,
+        'invalidCharacters' : {
+            'ru' : 'ОШИБКА: Недопустимые символы:<strong> {errorSymbols}</strong>',
+            'en' : 'ERROR: Invalid characters:<strong> {errorSymbols}</strong>'
+        },
+        'fieldName' : {
+            'ru' : 'Поле: <strong>{fieldName}</strong>',
+            'en' : 'Field: <strong>{fieldName}</strong>'
+        } ,
+        'passwordRepeat' : {
+            'ru':'ОШИБКА: Поля <strong>"Пароль", "Повторите пароль"</strong>  должны полностью совпадать' ,
+            'en': 'ERROR: Поля <strong>"Password", "Repeat password"</strong>  must match exactly'
         }
     } ;
 }

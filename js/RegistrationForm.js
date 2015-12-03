@@ -12,14 +12,7 @@ function RegistrationForm(authorizationObj) {
     var $passwordDublElem = $('#regRepeatPassword');          // дублированный ввод пароля
     var $descriptionText = $('#regDescriptionText');
     var $messageText = $('#regMessageText');
-    var $DESCRIPTION_TEXT = '' +
-        '1.Допустимые символы для заполнения: латинские буквы <strong>a...z(A...Z)</strong>,' +
-        'цифры <strong>0...9</strong>,символ подчёркивания"_" <br> '+
-        '2.поле <strong>login</strong> должно быть длиной не менее <strong>6</strong>' +
-        ' символов и не более <strong>20</strong> символов.<br>' +
-        '3.поле <strong>password</strong> должно быть длиной не менее <strong>8</strong> символов и ' +
-        'не более <strong>20</strong> символов<br>'+
-        'в пароле должна быть хотя бы <strong>одна буква</strong> и хотя бы <strong>одна цифра</strong>' ;
+
 
     var fieldErrors = {
         'login' : true ,
@@ -30,11 +23,21 @@ function RegistrationForm(authorizationObj) {
     var LENGTH_MAX_LOGIN = 20 ;
     var LENGTH_MIN_PASSW = 8 ;
     var LENGTH_MAX_PASSW = 20 ;
-    var FIELD_TYP_LOGIN = 'login' ;
-    var FIELD_TYP_PASSW = 'password' ;
 
-    var USER_TYP_GUEST = 'guest';
-    var USER_TYP_USER = 'user';
+    var MESSAGE_ERROR_CSS = 'messageError' ;   //  класс для вывода ошибок
+    var MESSAGE_INFO_CSS = 'messageInfo' ;     //  класс для вывода информационных сообщений
+
+    var currentMessage = {                  // текущее сообщение(нужно при обновлении формы)
+        'fldName' : '' ,                    //
+        'messages' : [] ,                   // массив сообщений
+        'error' : false,
+        'textDirect' : false,                // true - прямое задание текста(от БД), иначе через таблицу
+        'susbst' : {}
+    } ;
+
+
+
+
     var _this = this;
     var regSuccessful = false ;
     // атрибуты авторизации
@@ -69,18 +72,13 @@ function RegistrationForm(authorizationObj) {
             }
         });
         commandSet() ;       // командные кнопки
-
-        $descriptionText.empty();
-        $descriptionText.append($DESCRIPTION_TEXT);
-        $descriptionText.css({'border': ' 2px solid green'});
+        var messages = [] ;
 
         // закрыть поля кроме login
         $loginElem.removeAttr('readonly') ;
         $passwordElem.attr('readonly','readonly') ;
         $passwordDublElem.attr('readonly','readonly') ;
-        $loginElem.focus() ;
 
-        $messageText.empty();
 
         $loginElem.autocomplete({
             source: function (request, response) {
@@ -176,20 +174,39 @@ function RegistrationForm(authorizationObj) {
                 dbValidate() ;
             }
         }) ;
+        _this.formShow() ;        // выводит элементы по текущему языку
+        $messageText.empty();
+        $loginElem.focus() ;
     };
     /**
      * вычисляет набор командных кнопок в зависимости от полноты заполнения
      */
     var  commandSet = function() {
+
+        var langMod = _this.langModule ;
+        var lang = paramSet.currentLang.toLowerCase() ;
+        var cmdTab = langMod.cmdTab ;
+        var cmdName = cmdTab['cmdProfile'][lang] ;
+
         var cmdProfile = {
-            text: "profile edit",
+            text: cmdName,
             click: function () {
                 $('#regDialog').dialog('close') ;
                 profileForm.edit() ;
             }
         } ;
+        cmdName = cmdTab['cmdBreak'][lang] ;
         var cmdBreak = {
-            text: "break",
+            text: cmdName,
+            click: function () {
+                $('#regDialog').dialog('close') ;
+            }
+        } ;
+
+        cmdName = cmdTab['cmOk'][lang] ;
+
+        var cmdOk = {
+            text: cmdName,
             click: function () {
                 $('#regDialog').dialog('close') ;
             }
@@ -199,7 +216,7 @@ function RegistrationForm(authorizationObj) {
         if (regSuccessful) {
             $('#regDialog').dialog("option", "buttons", [
                 cmdProfile,                                  // добавляется кнопка profile
-                cmdBreak
+                cmdOk
             ]) ;
 
         }else {
@@ -255,8 +272,9 @@ function RegistrationForm(authorizationObj) {
                 }
          }
             if (regSuccessful) {
-                messages[messI++] = 'registrationIsCompleted' ; // сообщение об  успехе
-                messagesShow(fldName = '',error=false,messages) ;
+                messages[0] = 'registrationCompleted' ; // сообщение об  успехе
+
+                messagesShow(fldName='',error=false,messages) ;
 
                 $loginElem.attr('readonly','readonly') ;
                 $passwordElem.attr('readonly','readonly') ;
@@ -313,7 +331,7 @@ function RegistrationForm(authorizationObj) {
             digitFlag = (digitFlag || (ch >= '0' && ch <='9')) ;
         }
         error = (error || errorSymbols.length > 0) ;
-        $messageText.empty() ;
+
 
         if (letterDigitFlag) {       // наличие буквы - цыфры
             if (!(letterFlag && digitFlag)) {
@@ -331,33 +349,39 @@ function RegistrationForm(authorizationObj) {
         return error ;
     } ;
     var messagesShow = function(fldName,error,messages,subst,directText) {
-        var lang = paramSet.currentLang.toLowerCase() ;
-        // lang = lang.toLowerCase() ;
+        // Оборачиваем в массив (если не массив)
+        if (typeof(messages) == 'string') {
+            messages =  [messages] ;
+        }
+        directText = (typeof(directText) !== 'boolean') ? false : directText ;
+        subst = (typeof(subst) == undefined) ? {} : subst ;
+
+        // сохранить на случай перевывода при изменении языка
+        currentMessage['fldName'] = fldName ;
+        currentMessage['messages'] = messages ;
+        currentMessage['error'] = error ;
+        currentMessage['subst'] = subst ;
+        currentMessage['directText'] = directText ;
+        //------------------------------
+        var lang = paramSet.currentLang.toLowerCase() ; // тек язык
         var langMod = _this.langModule ;
         var messageTab = langMod.messageTab ;
-
-        var TextOut = '' ;
         var br = '<br>' ;
+        $messageText.empty() ;
         var messageLine = '' ;
-
-
-
-
-
-
-
-       
-        if (error) {
-
-            var errorMessage = 'поле:<strong>' + fldName +'</strong> ошибки заполнения.'+br ;
-            for (var i = 0 ; i < messages.length ; i++) {
-                errorMessage += messages[i]+br ;
-            }
-            $messageText.css({'border': ' 2px solid red', 'color': 'red'});
-            $messageText.append(errorMessage);
-        }else {
-            $messageText.css({'border': '0'});
+        if (typeof(fldName) == 'string' && fldName.length > 0 ) {
+            subst['fieldName'] = fldName ;
+            messageLine = messageLineBuild('fieldName',subst,directText) ;
+            $messageText.append(messageLine+br);
         }
+        for (var i = 0; i < messages.length; i++) {
+            messageLine = messageLineBuild(messages[i],subst,directText) ;
+            $messageText.append(messageLine+br);
+        }
+        var cssClass = (error) ? MESSAGE_ERROR_CSS : MESSAGE_INFO_CSS ;
+        $messageText.removeClass() ;
+        $messageText.addClass(cssClass) ;
+
 
     } ;
     /**
@@ -384,19 +408,9 @@ function RegistrationForm(authorizationObj) {
         }
         return message ;
     } ;
-    var successfulMessage = function() {
-        $messageText.empty() ;
 
-        var mess = 'oK! Регистрация выполнена. <br> ' +
-                   'Можете перейти к заполнению профиля или сделать это позднее' ;
-        $messageText.css({'border': ' 2px solid blue', 'color': 'blue'}) ;
-
-        $messageText.append(mess);
-
-    } ;
-    this.formShow = function() {
+   this.formShow = function() {
         var lang = paramSet.currentLang.toLowerCase() ;
-        // lang = lang.toLowerCase() ;
         var langMod = _this.langModule ;
         var titleTab = langMod.titleTab ;
         var fieldTab = langMod.fieldTab ;
@@ -414,10 +428,14 @@ function RegistrationForm(authorizationObj) {
         $descriptionText.append( descript);
         $descriptionText.removeClass() ;
         $messageText.addClass(MESSAGE_INFO_CSS) ;
-        if(currentMessage['id'].length > 0) {            // перевывод текущего сообщения
-            messagesShow(currentMessage['id'],currentMessage['error'],currentMessage['directText']) ;
+        if(currentMessage['messages'].length > 0) {            // перевывод текущего сообщения
+            messagesShow(
+                currentMessage['fldName'],
+                currentMessage['error'],
+                currentMessage['messages'],
+                currentMessage['subst'],
+               currentMessage['directText']) ;
         }
-//        $descriptionText.css({'border': ' 2px solid green'});
     } ;
 
     var fieldShow = function(fldId,fldName) {
@@ -426,27 +444,6 @@ function RegistrationForm(authorizationObj) {
 
     var showTitle = function(title) {
         _this.currentDialog.dialog('option','title',title) ;
-    } ;
-    var messageShow = function(messageId,error,directText) {
-        currentMessage['id'] = messageId ; // запомнить тек сообщение
-        currentMessage['error']= error ;
-
-        directText = (typeof(directText) !== 'boolean') ? false : directText ;
-        currentMessage['directText']= directText ;
-        var langMod = _this.langModule ;
-        var message = '' ;
-        if (directText) {
-            message = messageId ;      // прямой текст
-        }else {
-            var lang = paramSet.currentLang.toLowerCase();
-            var messageTab = langMod.messageTab;
-            message = (typeof(messageTab[messageId][lang]) !== 'string') ? messageId : messageTab[messageId][lang];
-        }
-        var cssClass = (error) ? MESSAGE_ERROR_CSS : MESSAGE_INFO_CSS ;
-        $messageText.empty() ;
-        $messageText.removeClass() ;
-        $messageText.addClass(cssClass) ;
-        $messageText.append(message) ;
     } ;
     var messageClear = function() {
         currentMessage = '' ;

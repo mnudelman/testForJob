@@ -16,7 +16,8 @@ function EnterForm() {
     var currentMessage = {                  // текущее сообщение(нужно при обновлении формы)
         'id' : '',
         'error' : false,
-        'textDirect' : false                // true - прямое задание текста(от БД), иначе через таблицу
+        'textDirect' : false,                // true - прямое задание текста(от БД), иначе через таблицу
+        'susbst' : {}
         } ;
     var MESSAGE_ERROR_CSS = 'messageError' ;   //  класс для вывода ошибок
     var MESSAGE_INFO_CSS = 'messageInfo' ;     //  класс для вывода информационных сообщений
@@ -70,8 +71,6 @@ function EnterForm() {
             }
         }) ;
 
-        _this.formShow() ;        // выводит элементы по текущему языку
-        $messageText.empty();
 
         $("#login").autocomplete({
             source: function (request, response) {
@@ -88,6 +87,10 @@ function EnterForm() {
             },
             minLength: 0
         });
+
+        _this.formShow() ;        // выводит элементы по текущему языку
+        $messageText.empty();
+        $loginElem.focus() ;
     };
 
     /**
@@ -95,8 +98,7 @@ function EnterForm() {
      */
     var  commandSet = function() {
         var langMod = _this.langModule ;
-        var lang = paramSet.currentLang ;
-        lang = lang.toLowerCase() ;
+        var lang = paramSet.currentLang.toLowerCase() ;
         var cmdTab = langMod.cmdTab ;
         var cmdName = cmdTab['cmdGuest'][lang] ;
         var cmdGuest ={
