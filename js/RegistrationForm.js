@@ -71,6 +71,7 @@ function RegistrationForm(authorizationObj) {
                 }
             }
         });
+        $($descriptionText).accordion();
         commandSet() ;       // командные кнопки
         var messages = [] ;
 
@@ -123,6 +124,7 @@ function RegistrationForm(authorizationObj) {
             }
             fieldErrors['login'] = syntaxErr ;
         }) ;
+
         $passwordElem.focus(function() {
             if (regSuccessful) {
                 $passwordElem.attr('readonly','readonly') ;
@@ -165,10 +167,10 @@ function RegistrationForm(authorizationObj) {
             var err = false ;
             var messI = 0 ;
             if (valPassw !== valDubl ) {
-                err = true ;
-                messages[messI++] = 'Нет совпадения полей: password и passwordRepeat' ;
+                err = true;
+                messages[messI++] = 'passwordRepeat'; //'Нет совпадения полей: password и passwordRepeat' ;
+                messagesShow('passwordRepeat', err, messages);
             }
-            messageOut('passwordRepeat',err,messages) ;
             fieldErrors['passwordRepeat'] = err ;
             if (!err) {
                 dbValidate() ;
@@ -203,7 +205,7 @@ function RegistrationForm(authorizationObj) {
             }
         } ;
 
-        cmdName = cmdTab['cmOk'][lang] ;
+        cmdName = cmdTab['cmdOk'][lang] ;
 
         var cmdOk = {
             text: cmdName,
@@ -343,18 +345,34 @@ function RegistrationForm(authorizationObj) {
         if (errorSymbols.length > 0) {
             // 'Недопустимые символы:  ' + errorSymbols;
             subst['errorSymbols'] = errorSymbols ;
-            message[messI++] = 'invalidCharacters' ;
+            messages[messI++] = 'invalidCharacters' ;
         }
-        messagesShow(fldName,error,messages,subst) ;
+        messageClear() ;
+        if (error) {
+            messagesShow(fldName,error,messages,subst) ;
+        }
         return error ;
     } ;
+    /**
+     * Вывод сообщений об ошибках конкретного поля
+     * @param fldName    - имя поля (login, password,...)
+     * @param error      - boolean
+     * @param messages   - массив сообщений
+     * @param subst      - массив подстановок
+     * @param directText - boolean  - прямой вывод текста без подстановок
+     */
     var messagesShow = function(fldName,error,messages,subst,directText) {
+        // параметры для манипулирования языками//
+        var lang = paramSet.currentLang.toLowerCase() ;  // тек язык
+        var langMod = _this.langModule ;                 // модуль языковых таблиц
+        var fieldTab = langMod.fieldTab ;                // таблица полей
+        //----------------------------------  --//
         // Оборачиваем в массив (если не массив)
         if (typeof(messages) == 'string') {
             messages =  [messages] ;
         }
         directText = (typeof(directText) !== 'boolean') ? false : directText ;
-        subst = (typeof(subst) == undefined) ? {} : subst ;
+        subst = (subst == undefined) ? {} : subst ;
 
         // сохранить на случай перевывода при изменении языка
         currentMessage['fldName'] = fldName ;
@@ -363,21 +381,20 @@ function RegistrationForm(authorizationObj) {
         currentMessage['subst'] = subst ;
         currentMessage['directText'] = directText ;
         //------------------------------
-        var lang = paramSet.currentLang.toLowerCase() ; // тек язык
-        var langMod = _this.langModule ;
-        var messageTab = langMod.messageTab ;
         var br = '<br>' ;
-        $messageText.empty() ;
+        $messageText.empty() ;          // чистить область сообщений
         var messageLine = '' ;
+        // в первой строке имя поля ------------ //
         if (typeof(fldName) == 'string' && fldName.length > 0 ) {
-            subst['fieldName'] = fldName ;
-            messageLine = messageLineBuild('fieldName',subst,directText) ;
-            $messageText.append(messageLine+br);
+            subst['fieldName'] =fieldTab[fldName]['labelText'][lang] ;
+            messageLine = messageLineBuild('fieldName', subst, directText = false);
+            $messageText.append(messageLine + br);
         }
         for (var i = 0; i < messages.length; i++) {
             messageLine = messageLineBuild(messages[i],subst,directText) ;
             $messageText.append(messageLine+br);
         }
+        // класс области сообщений в зависимости от наличия ошибок
         var cssClass = (error) ? MESSAGE_ERROR_CSS : MESSAGE_INFO_CSS ;
         $messageText.removeClass() ;
         $messageText.addClass(cssClass) ;
@@ -386,41 +403,63 @@ function RegistrationForm(authorizationObj) {
     } ;
     /**
      * Построить строку сообщений
-     * в строке возможны подстановки вида '{parameter}'
+     * в строке возможны подстановки вида {parameter}
      * @param message   - текст
      * @param subst     - вектор подстановок
      */
-    var messageLineBuild = function(message,subst) {
-        while (message.indexOf('{') >= 0 )
+    var messageLineBuild = function(messageLine,subst,directText) {
+        var lang = paramSet.currentLang.toLowerCase() ;
+        var langMod = _this.langModule ;
+        var messageTab = langMod.messageTab ;
+        var messOut = '' ;
+        if (directText) {        // текст без подстановок
+            return messageLine ;
+        }
+        // --- язык  ----- //
+        var messId = messageLine ;    //
+        if (typeof(messageTab[messId][lang]) == 'string') {    // в messageTab есть элемент
+            messOut = messageTab[messId][lang] ;
+        }else {
+            messOut = messId ;
+        }
+
+        // Вычисляем подстановки  -------------- //
+        while (messOut.indexOf('{') >= 0 )
         {
-            var posBeg = message.indexOf('{');
-            var posEnd = message.indexOf('}');
+            var posBeg = messOut.indexOf('{');
+            var posEnd = messOut.indexOf('}');
             if (posBeg >=0 && posEnd >= 0) {
-                var param = message.substr(posBeg,posEnd - posBeg +1) ;
+                var param = messOut.substr(posBeg,posEnd - posBeg +1) ;
                 param = param.substr(1,param.length - 2) ;
-                if (typeof(subst[param]) !== undefined ) {
+                if (subst[param]!== undefined ) {
                     var val = subst[param] ;
-                    var leftPart = message.substr(0,posBeg - 1) ;
-                    var rightPart = message.substr(posEnd +1) ;
-                    message = leftPart + val + rightPart ;
+                    var leftPart = messOut.substr(0,posBeg) ;
+                    var rightPart = messOut.substr(posEnd +1) ;
+                    messOut = leftPart + val + rightPart ;
                 }
             }
         }
-        return message ;
+        return messOut ;
     } ;
-
+    /**
+     * Вывод формы целиком
+     */
    this.formShow = function() {
-        var lang = paramSet.currentLang.toLowerCase() ;
-        var langMod = _this.langModule ;
-        var titleTab = langMod.titleTab ;
-        var fieldTab = langMod.fieldTab ;
-        var cmdTab = langMod.cmdTab ;
-        var messageTab = langMod.messageTab ;
-        var title = titleTab[lang] ;
-        showTitle(title) ;
+
+        var lang = paramSet.currentLang.toLowerCase() ;    // текущий язык
+        var langMod = _this.langModule ;                   // языковый модуль формы
+        var titleTab = langMod.titleTab ;                  // заголовок формы
+        var fieldTab = langMod.fieldTab ;                  // таблица полей
+        var cmdTab = langMod.cmdTab ;                      // табл командных кнопок
+        var messageTab = langMod.messageTab ;              // табл сообщений
+
+       var title = titleTab[lang] ;
+         showTitle(title) ;
+
         for (var fldId in fieldTab) {
-            var fldName = fieldTab[fldId][lang] ;
-            fieldShow(fldId,fldName) ;
+            var labelId = fieldTab[fldId]['labelId'] ;         // id в html документе
+            var fldName = fieldTab[fldId]['labelText'][lang] ;// $('#'+id).text() в html документе
+            fieldShow(labelId,fldName) ;
         }
         commandSet() ;
         var descript = messageTab['description'][lang] ;
@@ -428,7 +467,7 @@ function RegistrationForm(authorizationObj) {
         $descriptionText.append( descript);
         $descriptionText.removeClass() ;
         $messageText.addClass(MESSAGE_INFO_CSS) ;
-        if(currentMessage['messages'].length > 0) {            // перевывод текущего сообщения
+        if(currentMessage['messages'].length > 0) {  // перевывести тек сообщение
             messagesShow(
                 currentMessage['fldName'],
                 currentMessage['error'],
@@ -437,16 +476,30 @@ function RegistrationForm(authorizationObj) {
                currentMessage['directText']) ;
         }
     } ;
-
+    /**
+     * Вывод имени поля
+     * @param fldId     - ид имени поля
+     * @param fldName   - знасение имени
+     */
     var fieldShow = function(fldId,fldName) {
         $('#'+fldId).text(fldName) ;
     } ;
-
+    /**
+     * Вывод заголовка
+      * @param title
+     */
     var showTitle = function(title) {
         _this.currentDialog.dialog('option','title',title) ;
     } ;
+    /**
+     * Чистить текущее сообщение
+     */
     var messageClear = function() {
-        currentMessage = '' ;
+            currentMessage['fldName'] = '' ;
+            currentMessage['error'] = false ;
+            currentMessage['messages'] =[] ;
+            currentMessage['subst'] = {} ;
+            currentMessage['directText'] = false ;
         $messageText.empty() ;
         $messageText.removeClass() ;
     }

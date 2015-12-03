@@ -18,6 +18,7 @@
 .field {
     background-color:rgb(239, 233, 233) ;
     width: 150px;
+  /*  border:2px solid green;*/
    }
 .field1 {
     background-color:rgb(239, 233, 233) ;

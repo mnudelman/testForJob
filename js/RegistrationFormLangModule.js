@@ -4,9 +4,18 @@
 function RegistrationFormLangModule() {
     this.titleTab = {'ru':'Регистрация', 'en': 'Registration'} ;
     this.fieldTab = {
-        'regLoginLabel' : {'ru' : 'логин', 'en' : 'login'},
-        'regPasswordLabel' : {'ru' : 'пароль', 'en' : 'password'},
-        'regPasswordRepeatLabel' : {'ru' : 'Повторите пароль', 'en' : 'Repeat password' }
+        'login' : {
+            labelId:'regLoginLabel',
+            labelText: {'ru' : 'логин', 'en' : 'login'}
+        },
+        'password' : {
+            labelId : 'regPasswordLabel',
+            labelText: {'ru' : 'пароль', 'en' : 'password'}
+        },
+        'passwordRepeat' : {
+            labelId : 'regPasswordRepeatLabel',
+            labelText: {'ru' : 'Повторите пароль', 'en' : 'Repeat password' }
+        }
     } ;
     this.cmdTab = {
         'cmdProfile' : {'ru': 'Профиль','en':'Profile'},
