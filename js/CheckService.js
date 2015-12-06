@@ -19,7 +19,12 @@ function CheckService() {
 
     var _this = this ;
 
-
+    /**
+     * привязывает параметры формы
+     * @param formModule    - описатели формы
+     * @param $descDiv      - обда
+     * @param $messDiv
+     */
     this.init = function(formModule,$descDiv,$messDiv) {
         lang = paramSet.currentLang.toLowerCase();    // текущий язык
         formMod = formModule;                         //  модуль формы
@@ -54,6 +59,7 @@ function CheckService() {
         if (currentRul['fieldRelation'] !== undefined ) {   // свяь со значениями дргих полей
             checkFieldRelation(currentRul['fieldRelation'],'fieldRelation') ;
         }
+        checkMessage() ;     // вывод сообщений
     } ;
     /**
      * проверить на принадлежность множествуСимволов
@@ -63,18 +69,20 @@ function CheckService() {
     var checkSetValue = function(setDescript,checkName) {
         var sets = (setDescript['sets'] !== undefined) ? setDescript['sets'] : [] ;
         var fieldValue =  getFieldVal() ;
-        var success = false ;
+        var success = true ;
         var errorSymbols = '' ;         // недопусти
         for (var i = 0 ; i < fieldValue.length ; i++ ) {
             var symb  = fieldValue[i] ;
+            var success_i = false ;
             for (var j = 0; j < sets.length; j++) {
                 var setId = sets[j] ;
                 if (isSetIncludes(symb,setId)) {
-                    success = true ;
+                    success_i = true ;
                     break ;
                 }
             }
-            if (!success) {
+            success = success && success_i ;
+            if (!success_i) {
                 errorSymbols += symb ;       //
             }
         }
@@ -92,32 +100,53 @@ function CheckService() {
     };
     /**
      * проверяет принадлежность элемента(символа) заданному множеству
+     * множество может быть контейнером [set1,set2,..]
      * @param elemSymb
      * @param setId
      */
     var isSetIncludes = function(elemSymb,setId) {
         var success = false ;
         var setDescript = formMod.symbolSets[setId] ;
+
         if (setDescript == undefined) {
             return false ;
         }
-        // множество задано интервалом [min,max]
-        var range = setDescript['range'] ;
-        if (typeof(range) == 'object') {
-            var min = range[0] ;
-            var max = range[1] ;
-            if (elemSymb >= min && elemSymb <= max) {
-                success = true ;
-            }
-        }
-        // множество задано списком символов
-        var symbols =  setDescript['symbols'] ;
-        if (typeof(symbols) == 'object') {
-            for (var i = 0; i < symbols.length; i++) {
-                if (elemSymb == symbols[i]) {
-                    success = true ;
-                    break ;
+        var setContainer = [] ; // массив объектов-описателей множеств
+        if (typeof(setDescript['sets']) == 'object') {
+            var sets = setDescript['sets'] ;
+            for (var i = 0; i < sets.length; i++) {
+                var setId_i = sets[i] ;
+                var descript_i = symbolSets[setId_i] ;
+                if (typeof(descript_i) == 'object') {
+                    setContainer[setContainer.length] = descript_i;
                 }
+            }
+        }else {
+            setContainer[setContainer.length] = setDescript ; // обернуть в []
+        }
+        for (var si = 0; si < setContainer.length; si++) {
+            // множество задано интервалом [min,max]
+            var currentSetDescript = setContainer[si] ;
+            var range = currentSetDescript['range'] ;
+            if (typeof(range) == 'object') {
+                var min = range[0] ;
+                var max = range[1] ;
+                if (elemSymb >= min && elemSymb <= max) {
+                    success = true ;
+                }
+            }
+            // множество задано списком символов
+            var symbols =  currentSetDescript['symbols'] ;
+            if (typeof(symbols) == 'object') {
+                for (var i = 0; i < symbols.length; i++) {
+                    if (elemSymb == symbols[i]) {
+                        success = true ;
+                        break ;
+                    }
+                }
+            }
+            if (success) {
+                break ;
             }
         }
         return success ;
@@ -164,24 +193,27 @@ function CheckService() {
         var sets = OPDescript['sets'] ;
         var fieldValue =  getFieldVal() ;
         var success = true ;
-        var isContained = {} ;    // вектор наличия элемента множества - для отладки
-        var setsNames = '' ;     // список имён множеств
+        var isContained = {} ;    // вектор наличия элемента множества
+        var setsNames = [] ;     // список имён множеств
         for (var i = 0; i< sets.length; i++ ) {
             var setId = sets[i]  ;
             isContained[setId] = false ;
-            setsNames += ((setsNames.length > 0) ? ',' : '') + getSetName(setId) ;
-            var success_i = false ;
+            setsNames[setsNames.length] =  getSetName(setId) ;
             for (var j = 0; j < fieldValue.length; j++ ) {
-                var symb = fieldValue[i] ;
+                var symb = fieldValue[j] ;
                 if (isSetIncludes(symb,setId)) {
                     isContained[setId] = true ;
-                    success_i  = true ;
                     break ;
                 }
             }
-            success = success && success_i ;
 
 
+
+        }
+        // успех, когда заполнен объект isContained
+        success = true ;
+        for (var stkey in isContained) {
+            success = success && isContained[stkey] ;
         }
         if (!success) {
             var messageId = OPDescript['message']['no'] ;
@@ -213,8 +245,8 @@ function CheckService() {
             if (fieldRelationDescript[opCod] == undefined) {
                 continue ;
             }
-            var fld1 = fieldRelationDescript[opCod]['fields'][0] ;
-            var fld2 =  fieldRelationDescript[opCod]['fields'][1] ;
+            var fld1 = fieldRelationDescript[opCod][0] ;
+            var fld2 =  fieldRelationDescript[opCod][1] ;
             var valFld1 = getFieldVal(fld1) ;
             var valFld2 = getFieldVal(fld2) ;
             var success_i = true ;
@@ -231,7 +263,7 @@ function CheckService() {
             }
             success = success && success_i ;
             if (!success_i) {
-                var messageId = fieldRelationDescript[opCod]['message']['no'] ;
+                var messageId = fieldRelationDescript['message']['no'] ;
                 var fldName1 = getFieldName(fld1) ;
                 var fldName2 = getFieldName(fld2) ;
                 if (messageId !== undefined) {
@@ -251,6 +283,88 @@ function CheckService() {
      */
     var getFieldName = function(fieldId) {
         return  fieldTab[fieldId]['labelText'] ;
+    };
+
+    var checkMessage = function() {
+        var messageLines = [] ;   // строки вывода
+        for (var checkName in currentMessages) {
+            var message = currentMessages[checkName] ;
+            messageLines[messageLines.length] = messageLineBuild(message) ;
+        }
+        // Вывод строки в область сообщений
+
+    } ;
+    /**
+     * построить строку сообщений
+     * @param message
+     * @returns {*}
+     */
+    var messageLineBuild = function(message) {
+        var messageId = message['messageId'] ;
+        if (messageId == undefined) {
+            return '*********' ;
+        }
+        var subst = message['subst'] ;      // подстановки в текст
+        if (subst == undefined) {
+            subst = {} ;
+        }
+        subst = substPrepare(subst) ;
+        var messOut = messageTab[messageId][lang] ;
+
+        // Вычисляем подстановки  -------------- //
+        while (messOut.indexOf('{') >= 0 )
+        {
+            var posBeg = messOut.indexOf('{');
+            var posEnd = messOut.indexOf('}');
+            if (posBeg >=0 && posEnd >= 0) {
+                var param = messOut.substr(posBeg,posEnd - posBeg +1) ;
+                param = param.substr(1,param.length - 2) ; // отбросить  { }
+
+                var leftPart = messOut.substr(0,posBeg) ;
+                var rightPart = messOut.substr(posEnd +1) ;
+
+                if (subst[param]!== undefined ) {    // есть подстановка
+                    var val = subst[param] ;
+                    messOut = leftPart + val + rightPart ;
+                }else {
+                    messOut = leftPart + '**************' + rightPart ;
+                }
+            }
+        }
+        return messOut ;
+    } ;
+    /**
+     * подготовить вектор подстановок - привести к виду
+     * substOut = {par1 : text1, par2: text2,...}
+     * Возможный вид : ...{par1: [{ru:textru,en:texten},..],par2:text2,...}
+     * @param subst
+     */
+    var substPrepare = function(subst) {
+        var simpleTypes = ['string','number','boolean'] ;
+        var substOut = {} ;
+        for (var parName in subst) {
+            var parText = subst[parName] ;
+            if (simpleTypes.indexOf(typeof(parText)) >= 0 ) {
+                substOut[parName] = parText + '' ;
+            } else {
+                substOut[parName] = parTextPrepare(parText) ;
+            }
+        }
+        return substOut ;
+    } ;
+    /**
+     * превратить parText  в строку
+     * @param parText = [el1,el2,..], где el = {ru:textRu , en: textEn }
+     * например, el_i - это может быть имена полей (см checkFieldRelation)
+     */
+    var parTextPrepare = function(parText) {
+        var textOut = '' ;
+        for (var i = 0; i < parText.length; i++) {
+            var elText = parText[i][lang] ;
+            elText = (elText == undefined ) ? '*******' : elText ;
+            textOut += ((textOut.length == 0) ? '' : ', ') +elText ;
+        }
+        return textOut ;
     }
 
   }
