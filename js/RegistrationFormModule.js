@@ -1,7 +1,7 @@
 /**
  * Модуль таблиц для вывода элементов формы на заданном языке
  */
-function RegistrationFormLangModule() {
+function RegistrationFormModule() {
     this.titleTab = {'ru': 'Регистрация', 'en': 'Registration'};
     this.fieldTab = {
         'login': {
@@ -79,6 +79,12 @@ function RegistrationFormLangModule() {
         'passwordRepeat': {
             'ru': 'ОШИБКА: Поля <strong>"Пароль", "Повторите пароль"</strong>  должны полностью совпадать',
             'en': 'ERROR: Поля <strong>"Password", "Repeat password"</strong>  must match exactly'
+        },
+        'obligatoryPresence' : {
+            'ru' : 'Обязательное присутствие символов из каждого из множеств:' +
+                   '<strong> {setsNames}</strong> ',
+            'en' : 'Mandatory presence of characters from each of the sets :' +
+            '<strong> {setsNames}</strong> '
         }
     };
     this.symbolSets = {
@@ -94,6 +100,13 @@ function RegistrationFormLangModule() {
             'name': {
                 'ru': 'Строчные латинские <strong>(a..z)</strong>',
                 'en': 'Lowercase latin letters <strong>(a..z)</strong> '
+            }
+        },
+        'latin' : {
+            'sets' : ['lowercaseLatin','uppercaseLatin'],
+            'name': {
+                'ru': 'Латинские буквы: <strong>(a..z,A..Z)</strong>',
+                'en': 'Latin letters: <strong>(a..z,A..Z)</strong> '
             }
         },
         'digits': {
@@ -114,7 +127,7 @@ function RegistrationFormLangModule() {
     this.fieldRules = {
         'login': {
             'symbolSet': {
-                'sets': ['lowercaseLatin', 'uppercaseLatin', 'underscore'],
+                'sets': ['lowercaseLatin', 'uppercaseLatin','digits','underscore'],
                 'message': {'no': 'invalidCharacters'}
             },
             'length': {
@@ -124,7 +137,7 @@ function RegistrationFormLangModule() {
         },
         'password': {
             'symbolSet': {
-                'sets': ['lowercaseLatin', 'uppercaseLatin', 'underscore'],
+                'sets': ['lowercaseLatin', 'uppercaseLatin','digits','underscore'],
                 'message': {'no': 'invalidCharacters'}
             },
             'length': {
@@ -132,8 +145,8 @@ function RegistrationFormLangModule() {
                 'message': {'no': 'fieldLengthRange'}
             },
             'obligatoryPresence': {
-                'sets': [['lowercaseLatin', 'uppercaseLatin'], ['digits']],
-                'message': {'no': 'obligatoryPresenceLetterDigit'}
+                'sets': ['latin', 'digits'],
+                'message': {'no': 'obligatoryPresence'}
             }
         },
         'passwordRepeat': {

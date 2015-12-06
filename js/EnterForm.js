@@ -29,7 +29,7 @@ function EnterForm() {
     var STAT_INIT = 'init' ;        // начальное состояние
     var STAT_GUEST = 'guest' ;      // определён как гость
     var STAT_USER = 'user' ;        // определён как пользователь
-    this.langModule = new EnterFormLangModule() ;     // языковый модуль формы
+    this.formModule = new EnterFormLangModule() ;     // языковый модуль формы
     var _this = this;
 
     // атрибуты авторизации
@@ -97,7 +97,7 @@ function EnterForm() {
      * вычисляет набор командных кнопок в зависимости от полноты заполнения
      */
     var  commandSet = function() {
-        var langMod = _this.langModule ;
+        var langMod = _this.formModule ;
         var lang = paramSet.currentLang.toLowerCase() ;
         var cmdTab = langMod.cmdTab ;
         var cmdName = cmdTab['cmdGuest'][lang] ;
@@ -270,7 +270,7 @@ function EnterForm() {
      this.formShow = function() {
         var lang = paramSet.currentLang.toLowerCase() ;
        // lang = lang.toLowerCase() ;
-        var langMod = _this.langModule ;
+        var langMod = _this.formModule ;
         var titleTab = langMod.titleTab ;
         var fieldTab = langMod.fieldTab ;
         var cmdTab = langMod.cmdTab ;
@@ -306,7 +306,7 @@ function EnterForm() {
 
         directText = (typeof(directText) !== 'boolean') ? false : directText ;
         currentMessage['directText']= directText ;
-        var langMod = _this.langModule ;
+        var langMod = _this.formModule ;
         var message = '' ;
         if (directText) {
             message = messageId ;      // прямой текст

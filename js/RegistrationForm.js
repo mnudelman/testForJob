@@ -50,13 +50,16 @@ function RegistrationForm(authorizationObj) {
         successful: false
     };
     this.currentDialog =  $('#regDialog') ;
-    this.langModule = new RegistrationFormLangModule() ;     // языковый модуль формы
-
+    this.formModule = new RegistrationFormModule() ;     // модуль описателей формы
+    var checkService  ;          // объект контроля полей
    // открыть
     // ---------------------
     this.edit = function () {
         profileForm  = paramSet.profileForm ;          // профиль
         paramSet.currentForm = _this ;                // сохраняем текущую форму
+        checkService = paramSet.checkService ;          // объект контроля полей
+        checkService.init(_this.formModule,$descriptionText,$messageText) ;
+
         $('#regDialog').dialog({
             title: 'registration',
             width: 500,
@@ -114,6 +117,10 @@ function RegistrationForm(authorizationObj) {
 
 
             var syntaxErr = fieldValidate('login',val,LENGTH_MIN_LOGIN,LENGTH_MAX_LOGIN) ;
+
+             checkService.syntaxChecking('login') ;
+
+
             var dbError = false ;
             if (!syntaxErr) {
                 $loginElem.attr('readonly','readonly') ;
@@ -141,6 +148,10 @@ function RegistrationForm(authorizationObj) {
 
             var letterDigitControl = true ;
             var syntaxErr = fieldValidate('password',val,LENGTH_MIN_PASSW,LENGTH_MAX_PASSW,letterDigitControl) ;
+
+            checkService.syntaxChecking('password') ;
+
+
             if (!syntaxErr) {
                 $passwordDublElem.removeAttr('readonly') ;
                 $passwordDublElem.focus() ;
@@ -166,6 +177,9 @@ function RegistrationForm(authorizationObj) {
             var messages = [] ;
             var err = false ;
             var messI = 0 ;
+
+            checkService.syntaxChecking('passwordRepeat') ;
+
             if (valPassw !== valDubl ) {
                 err = true;
                 messages[messI++] = 'passwordRepeat'; //'Нет совпадения полей: password и passwordRepeat' ;
@@ -185,7 +199,7 @@ function RegistrationForm(authorizationObj) {
      */
     var  commandSet = function() {
 
-        var langMod = _this.langModule ;
+        var langMod = _this.formModule ;
         var lang = paramSet.currentLang.toLowerCase() ;
         var cmdTab = langMod.cmdTab ;
         var cmdName = cmdTab['cmdProfile'][lang] ;
@@ -364,7 +378,7 @@ function RegistrationForm(authorizationObj) {
     var messagesShow = function(fldName,error,messages,subst,directText) {
         // параметры для манипулирования языками//
         var lang = paramSet.currentLang.toLowerCase() ;  // тек язык
-        var langMod = _this.langModule ;                 // модуль языковых таблиц
+        var langMod = _this.formModule ;                 // модуль языковых таблиц
         var fieldTab = langMod.fieldTab ;                // таблица полей
         //----------------------------------  --//
         // Оборачиваем в массив (если не массив)
@@ -409,7 +423,7 @@ function RegistrationForm(authorizationObj) {
      */
     var messageLineBuild = function(messageLine,subst,directText) {
         var lang = paramSet.currentLang.toLowerCase() ;
-        var langMod = _this.langModule ;
+        var langMod = _this.formModule ;
         var messageTab = langMod.messageTab ;
         var messOut = '' ;
         if (directText) {        // текст без подстановок
@@ -447,7 +461,7 @@ function RegistrationForm(authorizationObj) {
    this.formShow = function() {
 
         var lang = paramSet.currentLang.toLowerCase() ;    // текущий язык
-        var langMod = _this.langModule ;                   // языковый модуль формы
+        var langMod = _this.formModule ;                   // языковый модуль формы
         var titleTab = langMod.titleTab ;                  // заголовок формы
         var fieldTab = langMod.fieldTab ;                  // таблица полей
         var cmdTab = langMod.cmdTab ;                      // табл командных кнопок

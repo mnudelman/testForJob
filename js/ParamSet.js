@@ -19,6 +19,7 @@ function ParamSet() {
     this.registrationForm ;  // регистрация
     this.profileForm  ;      // профиль
     this.langControl ;       // управление языком вывода
+    this.checkService ;      // объект для проверки заполнения полей
     //-------------------------------------------------//
     this.user = {
         login : 'guest',
@@ -61,6 +62,7 @@ function ParamSet() {
         _this.registrationForm = new RegistrationForm();  // регистрация
         _this.profileForm  = new ProfileForm() ;          // профиль
         _this.langControl = new LangControl() ;
+        _this.checkService = new CheckService() ;
 //
         _this.dirImages = _this.winLocation+'/images' ;
         _this.dirHtmlFotos = _this.winLocation+'/photos' ;
