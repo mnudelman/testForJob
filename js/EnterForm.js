@@ -19,8 +19,6 @@ function EnterForm() {
         'textDirect' : false,                // true - прямое задание текста(от БД), иначе через таблицу
         'susbst' : {}
         } ;
-    var MESSAGE_ERROR_CSS = 'messageError' ;   //  класс для вывода ошибок
-    var MESSAGE_INFO_CSS = 'messageInfo' ;     //  класс для вывода информационных сообщений
 
     var USER_TYP_GUEST = 'guest';
     var USER_TYP_USER = 'user';
@@ -29,7 +27,7 @@ function EnterForm() {
     var STAT_INIT = 'init' ;        // начальное состояние
     var STAT_GUEST = 'guest' ;      // определён как гость
     var STAT_USER = 'user' ;        // определён как пользователь
-    this.formModule = new EnterFormLangModule() ;     // языковый модуль формы
+    this.formModule = new EnterFormModule() ;     // языковый модуль формы
     var _this = this;
 
     // атрибуты авторизации
@@ -49,8 +47,10 @@ function EnterForm() {
         // формы автризации
         registrationForm = paramSet.registrationForm;  // регистрация
         profileForm  = paramSet.profileForm ;          // профиль
-
         paramSet.currentForm = _this ;                // сохраняем текущую форму
+        checkService = paramSet.checkService ;          // объект контроля полей
+        checkService.init(_this.formModule,$descriptionText,$messageText) ;
+
         readyStat = STAT_INIT ;                       // начальное состояние
         $('#enterDialog').dialog({
             title: 'authorization',
@@ -89,7 +89,6 @@ function EnterForm() {
         });
 
         _this.formShow() ;        // выводит элементы по текущему языку
-        $messageText.empty();
         $loginElem.focus() ;
     };
 
@@ -186,14 +185,26 @@ function EnterForm() {
             var log = authorizationVect['login'];
             var passw = authorizationVect['password'];
             if (log.length == 0 || passw.length == 0) {
-                messageShow('fieldsMustBeFilled',error = true) ;      // ''ERROR:поля login,password должны быть заполнены!';' ;
+                var mess = {
+                    'fieldsMustBeFilled' : {
+                    'messageId': 'fieldsMustBeFilled'
+                     }
+                } ;
+                checkService.checkMessage(mess,error = true) ;
             } else {
 
                 ajaxExecute.getData(authorizationVect, true);
                 var tmpTimer = setInterval(function () {
                     var answ = ajaxExecute.getRequestResult();
                     if (false == answ || undefined == answ) {
-                        messageShow('noAnswerFromDB',error = true) ;      // 'ERROR:Нет ответа от БД';
+                        var mess = {
+                            'fieldsMustBeFilled' : {
+                                'messageId': 'noAnswerFromDB'
+                            }
+                        } ;
+                        checkService.checkMessage(mess,error = true) ;
+
+                        //messageShow('noAnswerFromDB',error = true) ;      // 'ERROR:Нет ответа от БД';
 
 
                         ready = false;
@@ -234,7 +245,12 @@ function EnterForm() {
         var error ;
         var directText ;
         if (ready) {
-            messageShow(message,error = false,directText = true) ;      // ответ БД
+
+            error = false;
+            var messageLines = [] ;
+            messageLines[0] = message ;
+            checkService.setFieldId('') ;    // чистить полеИд
+            checkService.messagesShow(messageLines,error) ;   // ответ БД - прямой текст
 // переопределяем кнопки при отсутствии ошибок
             if (userTyp == USER_TYP_GUEST) {
 
@@ -263,63 +279,31 @@ function EnterForm() {
             }
 
         } else {
-            messageShow(message,error = true,directText = true) ;      // ответ БД - прямой текст
+            error = true;
+            var messageLines = [] ;
+            messageLines[0] = message ;
+            checkService.setFieldId('') ;    // чистить полеИд
+            checkService.messagesShow(messageLines,error) ;   // ответ БД - прямой текст
         }
 
     } ;
-     this.formShow = function() {
-        var lang = paramSet.currentLang.toLowerCase() ;
-       // lang = lang.toLowerCase() ;
-        var langMod = _this.formModule ;
-        var titleTab = langMod.titleTab ;
-        var fieldTab = langMod.fieldTab ;
-        var cmdTab = langMod.cmdTab ;
-        var messageTab = langMod.messageTab ;
-        var title = titleTab[lang] ;
-        showTitle(title) ;
-        for (var fldId in fieldTab) {
-            var fldName = fieldTab[fldId][lang] ;
-            fieldShow(fldId,fldName) ;
-        }
+    /**
+     * Вывод формы целиком
+     */
+    this.formShow = function() {
+        checkService.changeLang() ;         // установить язык
+        var title = checkService.getFormTitle() ;
+        showTitle(title) ;                     // заголовок формы
+        checkService.fieldsLabelShow() ;            // имена полей
+        checkService.descriptionShow() ;      // описатель
         commandSet() ;
-        var descript = messageTab['description'][lang] ;
-        $descriptionText.empty();
-        $descriptionText.append( descript);
-         $descriptionText.removeClass() ;
-         $messageText.addClass(MESSAGE_INFO_CSS) ;
-         if(currentMessage['id'].length > 0) {            // перевывод текущего сообщения
-             messageShow(currentMessage['id'],currentMessage['error'],currentMessage['directText']) ;
-         }
-//        $descriptionText.css({'border': ' 2px solid green'});
+        checkService.checkMessage() ;
     } ;
 
-    var fieldShow = function(fldId,fldName) {
-        $('#'+fldId).text(fldName) ;
-    } ;
+
 
     var showTitle = function(title) {
         _this.currentDialog.dialog('option','title',title) ;
-    } ;
-    var messageShow = function(messageId,error,directText) {
-        currentMessage['id'] = messageId ; // запомнить тек сообщение
-        currentMessage['error']= error ;
-
-        directText = (typeof(directText) !== 'boolean') ? false : directText ;
-        currentMessage['directText']= directText ;
-        var langMod = _this.formModule ;
-        var message = '' ;
-        if (directText) {
-            message = messageId ;      // прямой текст
-        }else {
-            var lang = paramSet.currentLang.toLowerCase();
-            var messageTab = langMod.messageTab;
-            message = (typeof(messageTab[messageId][lang]) !== 'string') ? messageId : messageTab[messageId][lang];
-        }
-        var cssClass = (error) ? MESSAGE_ERROR_CSS : MESSAGE_INFO_CSS ;
-        $messageText.empty() ;
-        $messageText.removeClass() ;
-        $messageText.addClass(cssClass) ;
-        $messageText.append(message) ;
     } ;
     var messageClear = function() {
         currentMessage = '' ;

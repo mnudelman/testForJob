@@ -10,7 +10,7 @@
 
     <script language="javascript" src="js/ParamSet.js"></script>
     <script language="javascript" src="js/EnterForm.js"></script>
-    <script language="javascript" src="js/EnterFormLangModule.js"></script>
+    <script language="javascript" src="js/EnterFormModule.js"></script>
     <script language="javascript" src="js/ProfileForm.js"></script>
     <script language="javascript" src="js/RegistrationForm.js"></script>
     <script language="javascript" src="js/RegistrationFormModule.js"></script>
@@ -130,42 +130,42 @@
 
     <div class="form_item">
             <label>
-            <span class="label"><strong>surname:</strong></span>
-            <span> <input class="field" type="text" id="surname"> </span> </br>
+            <span class="label" id="proSurnameLabel"><strong>surname:</strong></span>
+            <span> <input class="field" type="text" id="proSsurname"> </span> </br>
             </label><br>
             <label><br>
-            <span class="label"> <strong>name:</strong> </span>
-            <span> <input class="field" type="text" id="name"></span> </br>
+            <span class="label" id="proNameLabel"> <strong>name:</strong> </span>
+            <span> <input class="field" type="text" id="proName"></span> </br>
             </label><br>
             <label>
-            <span class="label"> <strong>patronymic:</strong></span>
-            <span> <input class="field" type="text" id="patronymic"></span> </br>
+            <span class="label" id="proPatronymicLabel"> <strong>patronymic:</strong></span>
+            <span> <input class="field" type="text" id="proPatronymic"></span> </br>
             </label><br>
             <label>
-            <span class="label"><strong>e-mail:</strong>  </span>
-            <span> <input class="field1" type="email" id="e-mail"> </span></br>
+            <span class="label" id="proEmailLabel"><strong>e-mail:</strong>  </span>
+            <span> <input class="field1" type="mail" id="proEmail"> </span></br>
             </label>
         </div>
         </p>
-        <p><span class="label"><strong>sex:</strong></span>
+        <p><span class="label" id="proSexLabel"><strong>sex:</strong></span>
 
         <div class="group_item">
             <label>
-                <input type="radio" name="sex" value="m" id="sexMan">
-                мужской </label>
+                <input type="radio" name="sex" value="m" id="proSexMan">
+              <span id="proSexManLabel">  мужской </span></label>
             <label>
-                <input type="radio" name="sex" value="w" id="sexWoman">
-                женский</label></br>
+                <input type="radio" name="sex" value="w" id="proSexWoman">
+                <span id="proSexWomanLabel">  женский</span> </label></br>
         </div>
         </p>
         <label>
-        <p><span class="label"><strong>Birthday:</strong></span>
-            <input type="text" name="birthDay" id="birthday" readonly="readonly">
+        <p><span class="label" id="proBirthdayLabel"><strong>Birthday:</strong></span>
+            <input type="text" name="birthDay" id="proBirthday" readonly="readonly">
         </p></label>
 
         <p>
-            <strong>information about yourself:</strong> </br>
-            <textarea width=“1000px” height=“150px” name=“info” value="info" id="info"></textarea>
+            <span id="proInfoLabel"><strong>information about yourself:</strong> </span></br>
+            <textarea width=“1000px” height=“150px” name=“info” value="info" id="proInfo"></textarea>
         </p>
         <div id="proMessageText"><p><strong></strong></p> </div>
 

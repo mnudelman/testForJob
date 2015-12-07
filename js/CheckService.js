@@ -16,9 +16,13 @@ function CheckService() {
     //---------------------------------------------------------
     var currentFieldId ;            // контролируемое поле
     var currentMessages = {} ;      // сообщения
-
+    var currentError = {} ;         // наличие ошибки контроля
+    //---------------------------------------------------------
+    var MESSAGE_ERROR_CSS = 'messageError' ;   //  класс для вывода ошибок
+    var MESSAGE_INFO_CSS = 'messageInfo' ;     //  класс для вывода информационных сообщений
+    //---------------------------------------------------------
     var _this = this ;
-
+    //---------------------------------------------------------
     /**
      * привязывает параметры формы
      * @param formModule    - описатели формы
@@ -37,6 +41,12 @@ function CheckService() {
         $descriptionDiv = $descDiv;
         $messageDiv = $messDiv;
     } ;
+    this.changeLang = function() {
+        lang = paramSet.currentLang.toLowerCase();    // текущий язык
+    } ;
+    this.setFieldId = function(fieldId) {
+       currentFieldId = fieldId ;
+    } ;
     /**
      * контроль синтаксиса
      */
@@ -47,6 +57,7 @@ function CheckService() {
         }
         var currentRul = fieldRules[fldId] ;
         currentMessages = {} ;
+        currentError = {} ;
         if (currentRul['symbolSet'] !== undefined) { // проверить на множество значений
             checkSetValue(currentRul['symbolSet'],'symbolSets') ;
         }
@@ -59,7 +70,14 @@ function CheckService() {
         if (currentRul['fieldRelation'] !== undefined ) {   // свяь со значениями дргих полей
             checkFieldRelation(currentRul['fieldRelation'],'fieldRelation') ;
         }
-        checkMessage() ;     // вывод сообщений
+        _this.checkMessage() ;     // вывод сообщений
+        var error = false ;
+        for (var checkName in currentError) {
+            error = error || currentError[checkName]  ;
+        }
+        return error ;
+
+
     } ;
     /**
      * проверить на принадлежность множествуСимволов
@@ -90,6 +108,7 @@ function CheckService() {
             return true ;
         }
         // ошибка формировать сообщение //
+        currentError[checkName] = true ;
         var messageId = setDescript['message']['no'] ;
         if (messageId !== undefined) {
             currentMessages[checkName] = {
@@ -176,6 +195,7 @@ function CheckService() {
         var max = range[1] ;
         success = (len >= min && len <= max) ;
         if (!success) {
+            currentError[checkName] = true ;
             var messageId = lengthDescript['message']['no'] ;
             if (messageId !== undefined) {
                 currentMessages[checkName] = {
@@ -216,6 +236,7 @@ function CheckService() {
             success = success && isContained[stkey] ;
         }
         if (!success) {
+            currentError[checkName] = true ;
             var messageId = OPDescript['message']['no'] ;
             if (messageId !== undefined) {
                 currentMessages[checkName] = {
@@ -263,6 +284,7 @@ function CheckService() {
             }
             success = success && success_i ;
             if (!success_i) {
+                currentError[checkName] = true ;
                 var messageId = fieldRelationDescript['message']['no'] ;
                 var fldName1 = getFieldName(fld1) ;
                 var fldName2 = getFieldName(fld2) ;
@@ -284,15 +306,35 @@ function CheckService() {
     var getFieldName = function(fieldId) {
         return  fieldTab[fieldId]['labelText'] ;
     };
-
-    var checkMessage = function() {
+    /**
+     * обрабатывает и выводит сообщения
+     * @param parMessages - объект-список сообщений
+     * @param parError    -
+     * Если входные параметры undefined, то берутся текущие
+     */
+    this.checkMessage = function(parMessages,parError) {
+        var messages = (parMessages == undefined) ? currentMessages : parMessages ;
+        if (parMessages !== undefined) {
+            currentMessages = parMessages ;
+        }
         var messageLines = [] ;   // строки вывода
-        for (var checkName in currentMessages) {
-            var message = currentMessages[checkName] ;
+        for (var checkName in messages) {
+            var message = messages[checkName] ;
             messageLines[messageLines.length] = messageLineBuild(message) ;
         }
         // Вывод строки в область сообщений
-
+        var error = false ;
+        if (parError == undefined) {
+            for (checkName in currentError) {
+                error = error || currentError[checkName]  ;
+            }
+        }else {
+            error = parError ;
+            currentError['parError'] = parError ;    // сохранить
+        }
+        if (messageLines.length > 0) {
+            _this.messagesShow(messageLines,error) ;
+        }
     } ;
     /**
      * построить строку сообщений
@@ -365,6 +407,58 @@ function CheckService() {
             textOut += ((textOut.length == 0) ? '' : ', ') +elText ;
         }
         return textOut ;
+    };
+    /**
+     * Вывод сообщений
+     */
+    this.messagesShow = function(messageLines,error) {
+        //------------------------------
+        var br = '<br>' ;
+        $messageDiv.empty() ;          // чистить область сообщений
+        // в первой строке имя поля ------------ //
+        if (typeof(currentFieldId) == 'string' && currentFieldId.length > 0 ) {
+            var fldName = getFieldName(currentFieldId) ;
+            var message = {
+                'messageId' : 'fieldName' ,
+                'subst'     : {'fieldName' : [fldName]}
+              } ;
+            var fldNameLine = messageLineBuild(message) ;
+
+            $messageDiv.append(fldNameLine + br);
+        }
+        for (var i = 0; i < messageLines.length; i++) {
+            var lineOut = messageLines[i] ;
+            $messageDiv.append(lineOut+br);
+        }
+        // класс области сообщений в зависимости от наличия ошибок
+        var cssClass = (error) ? MESSAGE_ERROR_CSS : MESSAGE_INFO_CSS ;
+        $messageDiv.removeClass() ;
+        $messageDiv.addClass(cssClass) ;
+
+
+    } ;
+    /**
+     * вывод label-имён полей
+     */
+    this.fieldsLabelShow = function() {
+        for (var fldId in fieldTab) {
+            var labelId = fieldTab[fldId]['labelId'] ;         // id в html документе
+            var fldName = fieldTab[fldId]['labelText'][lang] ;// $('#'+id).text() в html документе
+            $('#'+labelId).text(fldName) ;
+        }
+    } ;
+    /**
+     * имя формы
+     * @returns {*}
+     */
+    this.getFormTitle = function() {
+        return titleTab[lang] ;
+    } ;
+    this.descriptionShow = function() {
+        var descriptText = messageTab['description'][lang] ;
+        $descriptionDiv.empty();
+        $descriptionDiv.append(descriptText);
     }
+
 
   }

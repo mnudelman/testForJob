@@ -19,25 +19,6 @@ function RegistrationForm(authorizationObj) {
         'password' : true,
         'passwordRepeat' : true
     } ;
-    var LENGTH_MIN_LOGIN = 6 ;
-    var LENGTH_MAX_LOGIN = 20 ;
-    var LENGTH_MIN_PASSW = 8 ;
-    var LENGTH_MAX_PASSW = 20 ;
-
-    var MESSAGE_ERROR_CSS = 'messageError' ;   //  класс для вывода ошибок
-    var MESSAGE_INFO_CSS = 'messageInfo' ;     //  класс для вывода информационных сообщений
-
-    var currentMessage = {                  // текущее сообщение(нужно при обновлении формы)
-        'fldName' : '' ,                    //
-        'messages' : [] ,                   // массив сообщений
-        'error' : false,
-        'textDirect' : false,                // true - прямое задание текста(от БД), иначе через таблицу
-        'susbst' : {}
-    } ;
-
-
-
-
     var _this = this;
     var regSuccessful = false ;
     // атрибуты авторизации
@@ -74,10 +55,7 @@ function RegistrationForm(authorizationObj) {
                 }
             }
         });
-        $($descriptionText).accordion();
-        commandSet() ;       // командные кнопки
-        var messages = [] ;
-
+//        $($descriptionText).accordion();
         // закрыть поля кроме login
         $loginElem.removeAttr('readonly') ;
         $passwordElem.attr('readonly','readonly') ;
@@ -113,15 +91,9 @@ function RegistrationForm(authorizationObj) {
                 $loginElem.attr('readonly','readonly') ;
                 return ;
             }
-            var val = $loginElem.val() ;
+            var syntaxErr = checkService.syntaxChecking('login') ;
 
 
-            var syntaxErr = fieldValidate('login',val,LENGTH_MIN_LOGIN,LENGTH_MAX_LOGIN) ;
-
-             checkService.syntaxChecking('login') ;
-
-
-            var dbError = false ;
             if (!syntaxErr) {
                 $loginElem.attr('readonly','readonly') ;
                 $passwordElem.removeAttr('readonly') ;
@@ -144,13 +116,7 @@ function RegistrationForm(authorizationObj) {
                 $passwordElem.attr('readonly','readonly') ;
                 return ;
             }
-            var val = $passwordElem.val() ;
-
-            var letterDigitControl = true ;
-            var syntaxErr = fieldValidate('password',val,LENGTH_MIN_PASSW,LENGTH_MAX_PASSW,letterDigitControl) ;
-
-            checkService.syntaxChecking('password') ;
-
+            var syntaxErr = checkService.syntaxChecking('password') ;
 
             if (!syntaxErr) {
                 $passwordDublElem.removeAttr('readonly') ;
@@ -172,26 +138,15 @@ function RegistrationForm(authorizationObj) {
                 $passwordDublElem.attr('readonly','readonly') ;
                 return ;
             }
-            var valDubl = $passwordDublElem.val() ;
-            var valPassw = $passwordElem.val() ;
-            var messages = [] ;
-            var err = false ;
-            var messI = 0 ;
+            var err = checkService.syntaxChecking('passwordRepeat') ;
 
-            checkService.syntaxChecking('passwordRepeat') ;
-
-            if (valPassw !== valDubl ) {
-                err = true;
-                messages[messI++] = 'passwordRepeat'; //'Нет совпадения полей: password и passwordRepeat' ;
-                messagesShow('passwordRepeat', err, messages);
-            }
             fieldErrors['passwordRepeat'] = err ;
             if (!err) {
                 dbValidate() ;
             }
         }) ;
         _this.formShow() ;        // выводит элементы по текущему языку
-        $messageText.empty();
+//        $messageText.empty();
         $loginElem.focus() ;
     };
     /**
@@ -288,10 +243,12 @@ function RegistrationForm(authorizationObj) {
                 }
          }
             if (regSuccessful) {
-                messages[0] = 'registrationCompleted' ; // сообщение об  успехе
-
-                messagesShow(fldName='',error=false,messages) ;
-
+                var message = {'registrationComplete' : {
+                        messageId: 'registrationCompleted'
+                    }
+                };
+                checkService.setFieldId('') ;    // чистить полеИд
+                checkService.checkMessage(message,error = false) ;  // сообщение о регистрации
                 $loginElem.attr('readonly','readonly') ;
                 $passwordElem.attr('readonly','readonly') ;
                 $passwordDublElem.attr('readonly','readonly') ;
@@ -300,8 +257,11 @@ function RegistrationForm(authorizationObj) {
                 topMenu.showUser() ;
             }else {                         // сообщения БД прямой текст
                 var err = true ;
-                messages[0] = message ;
-                messagesShow(fldName = 'login',err,messages,subst,directText = true) ;
+                var messageLines = [] ;
+                messageLines[0] = message ;
+                checkService.setFieldId('') ;    // чистить полеИд
+                checkService.messagesShow(messageLines,err) ;   // прямой вывод текста
+
                 $loginElem.removeAttr('readonly') ;
                 $loginElem.focus() ;
             }
@@ -310,193 +270,16 @@ function RegistrationForm(authorizationObj) {
         }, 300);
     } ;
     /**
-     *  проверяет допустимость заполнения конкретного поля
-     *  формирует массив сообщений об ошибках
-     * @param fldName          -  имя поля
-     * @param fldVal           - значение
-     * @param lengthMin        - мин число символов
-     * @param lengthMax        - мах число символов
-     * @param letterDigitFlag  - наличие букв и цифр в значении
-     * @returns {boolean}      - ошибка
-     */
-    var fieldValidate = function(fldName,fldVal,lengthMin,lengthMax,letterDigitFlag) {
-        var val = fldVal ;
-        var error = false ;
-        var messages = [] ;
-        var messI = 0 ;
-        var errorSymbols = '' ;
-        var errorMessage = '' ;
-        var letterFlag = false ;     // наличие буквы
-        var digitFlag = false ;      // наличие цифры
-        var directText = false ;     // прямой текст без перевода
-        var subst = {} ;             // вектор подстановок
-        var br = '<br>' ;
-        if (val.length < lengthMin || val.length > lengthMax) {
-            error = true ;
-            subst['lengthMin'] = lengthMin ;
-            subst['lengthMax'] = lengthMax ;
-            messages[messI++] = 'fieldLengthRange' ; // 'Длина поля должна быть в интервале: от '+ lengthMin+ ' до '+lengthMax ;
-        }
-
-        for (var i = 0; i < val.length ; i++) {
-            var ch = val[i] ;
-            if ( !(ch >= 'a' && ch <='z' || ch >= 'A' && ch <='Z' || ch >= '0' && ch <='9' || ch == '_') ) {
-                errorSymbols += ch ;
-            }
-            letterFlag = (letterFlag || (ch >= 'a' && ch <='z' || ch >= 'A' && ch <='Z')) ;
-            digitFlag = (digitFlag || (ch >= '0' && ch <='9')) ;
-        }
-        error = (error || errorSymbols.length > 0) ;
-
-
-        if (letterDigitFlag) {       // наличие буквы - цыфры
-            if (!(letterFlag && digitFlag)) {
-                error = true ;
-                // 'Обязательно наличие одной буквы и одной цифры.' ;
-                messages[messI++] = 'obligatoryPresenceLetterDigit' ;
-            }
-        }
-        if (errorSymbols.length > 0) {
-            // 'Недопустимые символы:  ' + errorSymbols;
-            subst['errorSymbols'] = errorSymbols ;
-            messages[messI++] = 'invalidCharacters' ;
-        }
-        messageClear() ;
-        if (error) {
-            messagesShow(fldName,error,messages,subst) ;
-        }
-        return error ;
-    } ;
-    /**
-     * Вывод сообщений об ошибках конкретного поля
-     * @param fldName    - имя поля (login, password,...)
-     * @param error      - boolean
-     * @param messages   - массив сообщений
-     * @param subst      - массив подстановок
-     * @param directText - boolean  - прямой вывод текста без подстановок
-     */
-    var messagesShow = function(fldName,error,messages,subst,directText) {
-        // параметры для манипулирования языками//
-        var lang = paramSet.currentLang.toLowerCase() ;  // тек язык
-        var langMod = _this.formModule ;                 // модуль языковых таблиц
-        var fieldTab = langMod.fieldTab ;                // таблица полей
-        //----------------------------------  --//
-        // Оборачиваем в массив (если не массив)
-        if (typeof(messages) == 'string') {
-            messages =  [messages] ;
-        }
-        directText = (typeof(directText) !== 'boolean') ? false : directText ;
-        subst = (subst == undefined) ? {} : subst ;
-
-        // сохранить на случай перевывода при изменении языка
-        currentMessage['fldName'] = fldName ;
-        currentMessage['messages'] = messages ;
-        currentMessage['error'] = error ;
-        currentMessage['subst'] = subst ;
-        currentMessage['directText'] = directText ;
-        //------------------------------
-        var br = '<br>' ;
-        $messageText.empty() ;          // чистить область сообщений
-        var messageLine = '' ;
-        // в первой строке имя поля ------------ //
-        if (typeof(fldName) == 'string' && fldName.length > 0 ) {
-            subst['fieldName'] =fieldTab[fldName]['labelText'][lang] ;
-            messageLine = messageLineBuild('fieldName', subst, directText = false);
-            $messageText.append(messageLine + br);
-        }
-        for (var i = 0; i < messages.length; i++) {
-            messageLine = messageLineBuild(messages[i],subst,directText) ;
-            $messageText.append(messageLine+br);
-        }
-        // класс области сообщений в зависимости от наличия ошибок
-        var cssClass = (error) ? MESSAGE_ERROR_CSS : MESSAGE_INFO_CSS ;
-        $messageText.removeClass() ;
-        $messageText.addClass(cssClass) ;
-
-
-    } ;
-    /**
-     * Построить строку сообщений
-     * в строке возможны подстановки вида {parameter}
-     * @param message   - текст
-     * @param subst     - вектор подстановок
-     */
-    var messageLineBuild = function(messageLine,subst,directText) {
-        var lang = paramSet.currentLang.toLowerCase() ;
-        var langMod = _this.formModule ;
-        var messageTab = langMod.messageTab ;
-        var messOut = '' ;
-        if (directText) {        // текст без подстановок
-            return messageLine ;
-        }
-        // --- язык  ----- //
-        var messId = messageLine ;    //
-        if (typeof(messageTab[messId][lang]) == 'string') {    // в messageTab есть элемент
-            messOut = messageTab[messId][lang] ;
-        }else {
-            messOut = messId ;
-        }
-
-        // Вычисляем подстановки  -------------- //
-        while (messOut.indexOf('{') >= 0 )
-        {
-            var posBeg = messOut.indexOf('{');
-            var posEnd = messOut.indexOf('}');
-            if (posBeg >=0 && posEnd >= 0) {
-                var param = messOut.substr(posBeg,posEnd - posBeg +1) ;
-                param = param.substr(1,param.length - 2) ;
-                if (subst[param]!== undefined ) {
-                    var val = subst[param] ;
-                    var leftPart = messOut.substr(0,posBeg) ;
-                    var rightPart = messOut.substr(posEnd +1) ;
-                    messOut = leftPart + val + rightPart ;
-                }
-            }
-        }
-        return messOut ;
-    } ;
-    /**
      * Вывод формы целиком
      */
    this.formShow = function() {
-
-        var lang = paramSet.currentLang.toLowerCase() ;    // текущий язык
-        var langMod = _this.formModule ;                   // языковый модуль формы
-        var titleTab = langMod.titleTab ;                  // заголовок формы
-        var fieldTab = langMod.fieldTab ;                  // таблица полей
-        var cmdTab = langMod.cmdTab ;                      // табл командных кнопок
-        var messageTab = langMod.messageTab ;              // табл сообщений
-
-       var title = titleTab[lang] ;
-         showTitle(title) ;
-
-        for (var fldId in fieldTab) {
-            var labelId = fieldTab[fldId]['labelId'] ;         // id в html документе
-            var fldName = fieldTab[fldId]['labelText'][lang] ;// $('#'+id).text() в html документе
-            fieldShow(labelId,fldName) ;
-        }
-        commandSet() ;
-        var descript = messageTab['description'][lang] ;
-        $descriptionText.empty();
-        $descriptionText.append( descript);
-        $descriptionText.removeClass() ;
-        $messageText.addClass(MESSAGE_INFO_CSS) ;
-        if(currentMessage['messages'].length > 0) {  // перевывести тек сообщение
-            messagesShow(
-                currentMessage['fldName'],
-                currentMessage['error'],
-                currentMessage['messages'],
-                currentMessage['subst'],
-               currentMessage['directText']) ;
-        }
-    } ;
-    /**
-     * Вывод имени поля
-     * @param fldId     - ид имени поля
-     * @param fldName   - знасение имени
-     */
-    var fieldShow = function(fldId,fldName) {
-        $('#'+fldId).text(fldName) ;
+       checkService.changeLang() ;         // установить язык
+       var title = checkService.getFormTitle() ;
+       showTitle(title) ;                     // заголовок формы
+       checkService.fieldsLabelShow() ;            // имена полей
+       checkService.descriptionShow() ;      // описатель
+       commandSet() ;
+       checkService.checkMessage() ;
     } ;
     /**
      * Вывод заголовка
@@ -505,18 +288,6 @@ function RegistrationForm(authorizationObj) {
     var showTitle = function(title) {
         _this.currentDialog.dialog('option','title',title) ;
     } ;
-    /**
-     * Чистить текущее сообщение
-     */
-    var messageClear = function() {
-            currentMessage['fldName'] = '' ;
-            currentMessage['error'] = false ;
-            currentMessage['messages'] =[] ;
-            currentMessage['subst'] = {} ;
-            currentMessage['directText'] = false ;
-        $messageText.empty() ;
-        $messageText.removeClass() ;
-    }
 
 }
 

@@ -27,6 +27,8 @@ function ProfileForm(authorizationObj) {
     var userLogin  ;
     var profileImport = {} ;    // массив для импорта профиля
     var requestReady = false ;  // флаг завершения запроса
+    this.formModule = new ProfileFormModule() ;     // модуль описателей формы
+    var checkService  ;          // объект контроля полей
 
     // ---------------------
     /**
@@ -52,12 +54,18 @@ function ProfileForm(authorizationObj) {
         paramSet.setProfile(profileImport) ;
     } ;
     this.edit = function () {
+        paramSet.currentForm = _this ;                // сохраняем текущую форму
+        checkService = paramSet.checkService ;          // объект контроля полей
+        checkService.init(_this.formModule,undefined,$messageText) ;
+
+
        userLogin = paramSet.user['login'] ;
         _this.currentDialog.dialog({
             title: 'profile',
             width: 500,
             modal: true,
             beforeClose: function (event, ui) {
+                paramSet.currentForm = '' ;              // чистить текущую форму
                 paramSet.setProfile(profileImport) ;     // доступ к текущему профилю
                 var topMenu =paramSet.topMenu ;
                 topMenu.showUser() ;
@@ -78,13 +86,10 @@ function ProfileForm(authorizationObj) {
                     picker.selectedMonth + '-' +
                     picker.selectedDay ;
                 var d = new Date(picker.selectedYear,picker.selectedMonth,picker.selectedDay) ;
-                //$("#birthDay").val(normalDate) ;
                 $("#birthDay").val(d) ;
                 $("#birthday").datepicker('setDate',d) ;
-           //     $("#birthday").datepicker('hide') ;
             }
         } )  ;
-       // $("#birthDay").datepicker.setDefaults($("#birthDay").datepicker.regional['ru']);
         $('#sexMan').focus(function(){
                 $('#sexMan').attr('checked',"checked") ;
                 $('#sexWoman').removeAttr('checked') ;
@@ -107,8 +112,8 @@ function ProfileForm(authorizationObj) {
             }
         }) ;
 
-
-        commandSet();       // командные кнопки
+        _this.formShow() ;
+        //commandSet();       // командные кнопки
 
         // закрыть поля кроме login
 
@@ -435,6 +440,26 @@ function ProfileForm(authorizationObj) {
         })
 
     } ;
+    /**
+     * Вывод формы целиком
+     */
+    this.formShow = function() {
+        checkService.changeLang() ;         // установить язык
+        var title = checkService.getFormTitle() ;
+        showTitle(title) ;                     // заголовок формы
+        checkService.fieldsLabelShow() ;            // имена полей
+        checkService.descriptionShow() ;      // описатель
+        commandSet() ;
+        checkService.checkMessage() ;
+    } ;
+    /**
+     * Вывод заголовка
+     * @param title
+     */
+    var showTitle = function(title) {
+        _this.currentDialog.dialog('option','title',title) ;
+    } ;
+
 
 
 }
