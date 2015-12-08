@@ -30,22 +30,40 @@ function CheckService() {
      * @param $messDiv
      */
     this.init = function(formModule,$descDiv,$messDiv) {
-        lang = paramSet.currentLang.toLowerCase();    // текущий язык
-        formMod = formModule;                         //  модуль формы
-        titleTab = formMod.titleTab;                  // заголовок формы
-        fieldTab = formMod.fieldTab;                  // таблица полей
-        cmdTab = formMod.cmdTab;                      // табл командных кнопок
-        messageTab = formMod.messageTab;              // табл сообщений
-        symbolSets = formMod.symbolSets;
-        fieldRules = formMod.fieldRules;
+        _this.setFormModule(formModule) ;
         $descriptionDiv = $descDiv;
         $messageDiv = $messDiv;
+        currentMessages = {} ;
+        currentError = {} ;
+        currentFieldId = undefined ;
+        $messageDiv.empty() ;
     } ;
     this.changeLang = function() {
         lang = paramSet.currentLang.toLowerCase();    // текущий язык
     } ;
     this.setFieldId = function(fieldId) {
        currentFieldId = fieldId ;
+    } ;
+    /**
+     * Замена текущего formModule
+     * @param formModule
+     */
+    this.setFormModule = function(formModule) {
+        lang = paramSet.currentLang.toLowerCase();    // текущий язык
+        formMod = formModule;
+        if (formMod == undefined) {
+            return ;
+        }
+        titleTab = formMod.titleTab;                  // заголовок формы
+        fieldTab = formMod.fieldTab;                  // таблица полей
+        cmdTab = formMod.cmdTab;                      // табл командных кнопок
+        messageTab = formMod.messageTab;              // табл сообщений
+        symbolSets = formMod.symbolSets;
+        fieldRules = formMod.fieldRules;
+
+    } ;
+    this.getFormModule = function() {
+        return formMod ;
     } ;
     /**
      * контроль синтаксиса
@@ -415,6 +433,11 @@ function CheckService() {
         //------------------------------
         var br = '<br>' ;
         $messageDiv.empty() ;          // чистить область сообщений
+        // класс области сообщений в зависимости от наличия ошибок
+        var cssClass = (error) ? MESSAGE_ERROR_CSS : MESSAGE_INFO_CSS ;
+        $messageDiv.removeClass() ;
+        $messageDiv.addClass(cssClass) ;
+
         // в первой строке имя поля ------------ //
         if (typeof(currentFieldId) == 'string' && currentFieldId.length > 0 ) {
             var fldName = getFieldName(currentFieldId) ;
@@ -430,10 +453,6 @@ function CheckService() {
             var lineOut = messageLines[i] ;
             $messageDiv.append(lineOut+br);
         }
-        // класс области сообщений в зависимости от наличия ошибок
-        var cssClass = (error) ? MESSAGE_ERROR_CSS : MESSAGE_INFO_CSS ;
-        $messageDiv.removeClass() ;
-        $messageDiv.addClass(cssClass) ;
 
 
     } ;
@@ -444,6 +463,12 @@ function CheckService() {
         for (var fldId in fieldTab) {
             var labelId = fieldTab[fldId]['labelId'] ;         // id в html документе
             var fldName = fieldTab[fldId]['labelText'][lang] ;// $('#'+id).text() в html документе
+            var css = fieldTab[fldId]['css'] ;
+            if (css !== undefined) {
+                $('#'+labelId).css(css) ;
+            }else {
+                $('#'+labelId).css('font-weight','bold') ;
+            }
             $('#'+labelId).text(fldName) ;
         }
     } ;
@@ -455,6 +480,9 @@ function CheckService() {
         return titleTab[lang] ;
     } ;
     this.descriptionShow = function() {
+        if ($descriptionDiv == undefined) {
+            return ;
+        }
         var descriptText = messageTab['description'][lang] ;
         $descriptionDiv.empty();
         $descriptionDiv.append(descriptText);

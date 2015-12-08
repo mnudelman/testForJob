@@ -23,13 +23,13 @@ function EnterForm() {
     var USER_TYP_GUEST = 'guest';
     var USER_TYP_USER = 'user';
     this.currentDialog = $('#enterDialog') ;
-    var readyStat = '' ;                   // состояние готовности (определяет набор командных кнопок)
-    var STAT_INIT = 'init' ;        // начальное состояние
-    var STAT_GUEST = 'guest' ;      // определён как гость
-    var STAT_USER = 'user' ;        // определён как пользователь
+    var readyStat = 0 ;                   // состояние готовности (определяет набор командных кнопок)
+    var STAT_INIT = 0 ; //'init' ;        // начальное состояние
+    var STAT_GUEST = 5 ; //'guest' ;      // определён как гость
+    var STAT_USER = 10 ; // 'user' ;        // определён как пользователь
     this.formModule = new EnterFormModule() ;     // языковый модуль формы
     var _this = this;
-
+    var isExistingDialog = false ;           // флаг существования диалога
     // атрибуты авторизации
     var authorizationVect = {
         typ: 'userLogin',
@@ -52,6 +52,20 @@ function EnterForm() {
         checkService.init(_this.formModule,$descriptionText,$messageText) ;
 
         readyStat = STAT_INIT ;                       // начальное состояние
+        if (isExistingDialog)  {
+            _this.currentDialog.dialog('open') ;
+        }else {
+            dialogInit();
+            isExistingDialog = true;
+        }
+        _this.formShow() ;        // выводит элементы по текущему языку
+        $loginElem.focus() ;
+    };
+    /**
+     * определить диалог и его элементы
+     */
+    var dialogInit = function() {
+
         $('#enterDialog').dialog({
             title: 'authorization',
             width: 500,
@@ -68,6 +82,8 @@ function EnterForm() {
                 if (authorizationVect['successful'] == true) {
 
                 }
+                var topMenu = paramSet.topMenu ;
+                topMenu.menuShow() ;        // допустимые действия для пользователя
             }
         }) ;
 
@@ -87,11 +103,25 @@ function EnterForm() {
             },
             minLength: 0
         });
+        $loginElem.focus(function() {
+            if (readyStat > STAT_INIT) {
+                $loginElem.attr('readonly','readonly') ;
+            }else {
+                $loginElem.removeAttr('readonly') ;
+            }
+        }) ;
+        $passwordElem.focus(function() {
+            if (readyStat > STAT_INIT) {
+                $passwordElem.attr('readonly','readonly') ;
+            }else {
+                $passwordElem.removeAttr('readonly') ;
+            }
 
-        _this.formShow() ;        // выводит элементы по текущему языку
-        $loginElem.focus() ;
-    };
+        }) ;
 
+
+
+    } ;
     /**
      * вычисляет набор командных кнопок в зависимости от полноты заполнения
      */
@@ -176,11 +206,15 @@ function EnterForm() {
             authorizationVect['login'] = name;
 
             paramSet.setUser(authorizationVect);           // сохранить профиль
-
             var error = false ;
-            messageShow('loggedAsGuest',error) ;      // 'INFO:Вы вошли на сайт как ГОСТЬ' ;
+            var mess = {
+                'loggedAsGuest' : {
+                    'messageId': 'loggedAsGuest'
+                }
+            } ;
+            checkService.checkMessage(mess,error = false) ;  // 'INFO:Вы вошли на сайт как ГОСТЬ' ;
             ready = true;
-            enterReady(ready,message,userTyp) ;
+            enterReady(ready,message = '',userTyp) ;
         } else {
             var log = authorizationVect['login'];
             var passw = authorizationVect['password'];
@@ -241,20 +275,20 @@ function EnterForm() {
      * @param userTyp
      */
     var enterReady = function(ready,message,userTyp) {
-        $messageText.empty();
+//        $messageText.empty();
         var error ;
         var directText ;
         if (ready) {
 
             error = false;
             var messageLines = [] ;
-            messageLines[0] = message ;
-            checkService.setFieldId('') ;    // чистить полеИд
-            checkService.messagesShow(messageLines,error) ;   // ответ БД - прямой текст
+            if (typeof(message) == 'string' && message.length > 0 ) {
+                messageLines[0] = message;
+                checkService.setFieldId('');    // чистить полеИд
+                checkService.messagesShow(messageLines, error);   // ответ БД - прямой текст
+            }
 // переопределяем кнопки при отсутствии ошибок
             if (userTyp == USER_TYP_GUEST) {
-
-                $('#loginFields').empty() ;
                 readyStat = STAT_GUEST ;
                 commandSet() ;
             }

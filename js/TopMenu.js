@@ -5,11 +5,28 @@ function TopMenu() {
     var $topMenu = $('#topMenu') ;
     var $langItem = $('#langItem') ;
     var $userItem = $('#userItem') ;
+    var formModule = new TopMenuModule() ;
+    var enterLabel ;
+    var profileLabel ;
+    var changePasswordLabel ;
+    var emptyLabel = {'ru': ' ','en': ' '} ;
+    var _this = this ;
+    //--------------------------------------------//
     this.menuInit = function() {
         $(".testnav").addClass("ui-menu ui-widget ui-widget-content ui-corner-all");
         $(".testnav li").addClass("ui-menu-item");
         $(".sub-menu").hide();
 
+        var fieldTab = formModule.fieldTab ;
+
+        enterLabel = fieldTab['mnuEnter']['labelText'];
+        profileLabel = fieldTab['profile']['labelText'];
+        changePasswordLabel = fieldTab['changePassword']['labelText'];
+
+
+
+
+        _this.menuShow() ;
 
         $(".clk").click(function(){
 
@@ -27,13 +44,24 @@ function TopMenu() {
                 },
                 select: function(e,ui) {
                   //var item = $(ui.item) ;
+                   var userStat = paramSet.user['status'] ;
+                   userStat = (userStat == undefined) ? 0 : userStat ;
+
+
                   var id = $(ui.item).attr('id') ;
                   switch(id) {
-                      case 'userProfileItem' :
-                          var proFileForm = paramSet.profileForm ;
-                          proFileForm.edit() ;
+                      case 'enterItem' :
+                              var enterForm = paramSet.enterForm ;
+                              enterForm.edit() ;
                           break ;
-
+                      case 'userProfileItem' :
+                              var proFileForm = paramSet.profileForm;
+                              proFileForm.edit();
+                          break ;
+                      case 'changePasswordItem' :
+                              var form = paramSet.registrationForm;
+                              form.edit('changePassword');
+                          break ;
                   }
                 }
             });
@@ -42,6 +70,14 @@ function TopMenu() {
 
         });
 
+    } ;
+    this.menuShow = function() {
+       _this.setUserSubmenu() ;
+       var checkService = paramSet.checkService ;
+       var currentFormModule = checkService.getFormModule() ;    // запомнить текущий
+       checkService.setFormModule(formModule) ;                  // установить свой
+       checkService.fieldsLabelShow() ;                          // имена menuItems
+      checkService.setFormModule(currentFormModule) ;          // восстановить currentFormModule
     } ;
     /**
      * вывести в меню фото и имя пользователя
@@ -74,9 +110,20 @@ function TopMenu() {
         $('#userItem_a').empty() ;
         $('#userItem_a').append(userPhoto) ;
         $('#userItem_a').append(name) ;
+    } ;
+    this.setUserSubmenu = function() {
+        var fieldTab = formModule.fieldTab ;
+        var userStat = paramSet.user['status'] ;
+        if (userStat < paramSet.USER_STAT_USER) {
+            fieldTab['mnuEnter']['labelText'] = enterLabel ;
+            fieldTab['profile']['labelText'] = emptyLabel ;
+            fieldTab['changePassword']['labelText'] = emptyLabel ;
 
-
-
+        }else {
+            fieldTab['mnuEnter']['labelText'] = emptyLabel ;
+            fieldTab['profile']['labelText'] = profileLabel ;
+            fieldTab['changePassword']['labelText'] = changePasswordLabel ;
+        }
     }
 }
 

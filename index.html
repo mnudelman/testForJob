@@ -12,10 +12,12 @@
     <script language="javascript" src="js/EnterForm.js"></script>
     <script language="javascript" src="js/EnterFormModule.js"></script>
     <script language="javascript" src="js/ProfileForm.js"></script>
+    <script language="javascript" src="js/ProfileFormModule.js"></script>
     <script language="javascript" src="js/RegistrationForm.js"></script>
     <script language="javascript" src="js/RegistrationFormModule.js"></script>
     <script language="javascript" src="js/CheckService.js"></script>
     <script language="javascript" src="js/TopMenu.js"></script>
+    <script language="javascript" src="js/TopMenuModule.js"></script>
     <script language="javascript" src="js/LangControl.js"></script>
     <script language="javascript" src="js/MainScript.js"></script>
     <script language="javascript" src="js/Authorization.js"></script>
@@ -35,11 +37,15 @@
 <div id="navigator">
     <ul id="nav" class="testnav">
     <li id="userItem"><div class="clk"  id="userItem_a">
-        <img src="./images/people.png" id="menuUserPhoto" title="photo" alt="photo" style="width:20px">guest
+        <img src="./images/people.png" id="menuUserPhoto" title="photo" alt="photo" style="width:20px">
+        <span id="mnuUserNameLabel">guest</span>
         </div>
         <ul class="sub-menu">
-            <li id="userProfileItem"><a href="#" id="userProfileItem_a">profile</a></li>
-   <!--         <li id="changePasswordItem"><a href="#" id="changePasswordItem_a">change password</a></li> -->
+            <li id="enterItem"><a href="#" id="enterItem_a">
+                <span id="enterLabel">authorization</span></a></li>
+            <li id="userProfileItem"><a href="#" id="userProfileItem_a"><span id="mnuProfileLabel">profile</span></a></li>
+            <li id="changePasswordItem"><a href="#" id="changePasswordItem_a">
+                <span id="mnuChangePasswordLabel">change password</span></a></li>
         </ul>
     </li>
     <li>
@@ -124,14 +130,14 @@
     <button class="langButton"  style="margin-left:400px"><img src="./images/ru.png" class="imgLang" title="lang"> RU</button>
    <div id="profPhoto">
         <img src="./images/people.png" id="userPhoto" title="photo" alt="photo" style="width:100px">
-        &nbsp;&nbsp<button id="addPhoto">newPhoto</button>
+        &nbsp;&nbsp<button id="addPhoto"><span id="addPhotoLabel">newPhoto</span></button>
        <span id="status" ></span>
    </div> <br>
 
     <div class="form_item">
             <label>
             <span class="label" id="proSurnameLabel"><strong>surname:</strong></span>
-            <span> <input class="field" type="text" id="proSsurname"> </span> </br>
+            <span> <input class="field" type="text" id="proSurname"> </span> </br>
             </label><br>
             <label><br>
             <span class="label" id="proNameLabel"> <strong>name:</strong> </span>

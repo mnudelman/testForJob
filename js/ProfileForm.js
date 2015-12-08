@@ -12,18 +12,18 @@ function ProfileForm(authorizationObj) {
     // атрибуты авторизации
     this.currentDialog = $('#profDialog');
     var profile = {
-        'surname' :{'val': '','field' : $('#surname')},
-        'name'    :{'val': '','field' : $('#name')},
-        'patronymic' :{'val': '','field' : $('#patronymic')},
-        'email' : {'val': '','field' : $('#e-mail')},
-        'tel'    : {'val': '','field' : $('#lel')},
+        'surname' :{'val': '','field' : $('#proSurname')},
+        'name'    :{'val': '','field' : $('#proName')},
+        'patronymic' :{'val': '','field' : $('#proPatronymic')},
+        'email' : {'val': '','field' : $('#proEmail')},
+        'tel'    : {'val': '','field' : $('#proTel')},
         'sex'    : {'val': '','field' : $('[name="sex"]')},
-        'birthday': {'val': '','field' : $('#birthday')},
-        'info'    : {'val': '','field' : $('#info')},
-        'filePhoto': {'val': '','field' : $('#addPhoto')}
+        'birthday': {'val': '','field' : $('#proBirthday')},
+        'info'    : {'val': '','field' : $('#proInfo')},
+        'filePhoto': {'val': '','field' : $('#proAddPhoto')}
     } ;
     var $messageText = $('#proMessageText') ;
-    var $emailField = $('#e-mail') ;
+    var $emailField = $('#proEmail') ;
     var userLogin  ;
     var profileImport = {} ;    // массив для импорта профиля
     var requestReady = false ;  // флаг завершения запроса
@@ -74,7 +74,7 @@ function ProfileForm(authorizationObj) {
         addPhotoInit() ;
         getFromDb() ;
 
-        $("#birthday").datepicker({changeMonth:true,
+        $("#proBirthday").datepicker({changeMonth:true,
             changeYear:true,
             minDate: new Date(1915, 0,1),
             maxDate: new Date(2010, 11,31),
@@ -86,34 +86,27 @@ function ProfileForm(authorizationObj) {
                     picker.selectedMonth + '-' +
                     picker.selectedDay ;
                 var d = new Date(picker.selectedYear,picker.selectedMonth,picker.selectedDay) ;
-                $("#birthDay").val(d) ;
-                $("#birthday").datepicker('setDate',d) ;
+                $("#proBirthDay").val(d) ;
+                $("#proBirthday").datepicker('setDate',d) ;
             }
         } )  ;
-        $('#sexMan').focus(function(){
-                $('#sexMan').attr('checked',"checked") ;
-                $('#sexWoman').removeAttr('checked') ;
+        $('#proSexMan').focus(function(){
+                $('#proSexMan').attr('checked',"checked") ;
+                $('#proSexWoman').removeAttr('checked') ;
         }) ;
 
-        $('#sexWoman').focus(function(){
-            $('#sexMan').removeAttr('checked') ;
-            $('#sexWoman').attr('checked',"checked") ;
+        $('#proSexWoman').focus(function(){
+            $('#proSexMan').removeAttr('checked') ;
+            $('#proSexWoman').attr('checked',"checked") ;
         }) ;
   //////////////////////////////////////////////////////////
 
         $emailField.blur(function(){
             $messageText.empty() ;
-            var val = $emailField.val() ;
-            if (val.indexOf('@') <= 0 ) {
-                var messages = [] ;
-                messages[0] = 'Должен быть обязательный символ "@" ' ;
-                var err = true ;
-                messageOut('e-mail',err,messages) ;
-            }
+            checkService.syntaxChecking('email') ;
         }) ;
 
         _this.formShow() ;
-        //commandSet();       // командные кнопки
 
         // закрыть поля кроме login
 
@@ -124,14 +117,20 @@ function ProfileForm(authorizationObj) {
      * вычисляет набор командных кнопок в зависимости от полноты заполнения
      */
     var commandSet = function () {
+        var langMod = _this.formModule ;
+        var lang = paramSet.currentLang.toLowerCase() ;
+        var cmdTab = langMod.cmdTab ;
+
+        var cmdName = cmdTab['cmdProfile'][lang] ;
         var cmdProfile = {
-            text: "save",
+            text: cmdName,                                             // "save",
             click: function () {
                 sendToDb() ;      // сохранить в БД
             }
         };
+        var cmdName = cmdTab['cmdBreak'][lang] ;
         var cmdBreak = {
-            text: "break",
+            text: cmdName,                                             // "break",
             click: function () {
                 _this.currentDialog.dialog('close');
             }
@@ -317,14 +316,14 @@ function ProfileForm(authorizationObj) {
     var sexField = function(opCod,value) {
        if (opCod == 'set') {
            if (value == 'm') {
-               $('#sexMan').attr('checked',"checked") ;
-               $('#sexWoman').removeAttr('checked') ;
+               $('#proSexMan').attr('checked',"checked") ;
+               $('#proSexWoman').removeAttr('checked') ;
            } else {
-               $('#sexMan').removeAttr('checked') ;
-               $('#sexWoman').attr('checked','checked') ;
+               $('#proSexMan').removeAttr('checked') ;
+               $('#proSexWoman').attr('checked','checked') ;
            }
        } else {
-           return ($('#sexMan').attr('checked') !== undefined ) ? 'm' : 'w' ;
+           return ($('#proSexMan').attr('checked') !== undefined ) ? 'm' : 'w' ;
        }
     } ;
     /**
@@ -341,12 +340,10 @@ function ProfileForm(authorizationObj) {
            var mm = arr[1] ;
            var dd = arr[2] ;
            var d = new Date(yy,mm,dd) ;
-           $("#birthday").datepicker('setDate',d) ;
-           $("#birthday").val(value) ;
+           $("#proBirthday").datepicker('setDate',d) ;
+           $("#proBirthday").val(value) ;
        } else {
-           var d = $("#birthday").val() ;
-           //var arr = str.split('-') ;
-           //var d = $("#birthday").datepicker('getDate') ;
+           var d = $("#proBirthday").val() ;
            return d ;
        }
     } ;

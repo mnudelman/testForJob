@@ -21,6 +21,10 @@ function LangControl() {
             if (typeof(currentForm) == 'object' ) {
                 currentForm.formShow() ;
             }
+            var topMenu = paramSet.topMenu ;
+            if (typeof(topMenu) == 'object' ) {
+                topMenu.menuShow() ;
+            }
         }) ;
     } ;
     /**
