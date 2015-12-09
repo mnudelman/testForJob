@@ -20,6 +20,9 @@ function RegistrationForm(authorizationObj) {
         'passwordRepeat' : true
     } ;
     var _this = this;
+    var currentAction = '' ;
+    var ACTION_REGISTRATION = 'registration';
+    var ACTION_CHANGE_PASSWORD = 'changePassword' ;
     var regSuccessful = false ;
     // атрибуты авторизации
     var authorizationVect = {
@@ -27,6 +30,7 @@ function RegistrationForm(authorizationObj) {
         login: '',
         password: '',
         newName: true,
+        newPassword : true,
         guest: false,
         successful: false
     };
@@ -35,12 +39,24 @@ function RegistrationForm(authorizationObj) {
     var checkService  ;          // объект контроля полей
    // открыть
     // ---------------------
-    this.edit = function () {
+    this.edit = function (action) {
+        action = (action == undefined) ? ACTION_REGISTRATION : action ;
+        currentAction = action ;
         profileForm  = paramSet.profileForm ;          // профиль
         paramSet.currentForm = _this ;                // сохраняем текущую форму
         checkService = paramSet.checkService ;          // объект контроля полей
         checkService.init(_this.formModule,$descriptionText,$messageText) ;
+        // при замене пароля login не редактируется
+        if (currentAction == ACTION_CHANGE_PASSWORD ) {
+            var log = paramSet.user['login'] ;
+            authorizationVect['login'] = log ;
+            authorizationVect['newName'] = false ;
+            $loginElem.val(log) ;
+            $loginElem.attr('readonly','readonly') ;
+            $passwordElem.removeAttr('readonly') ;
+            fieldErrors['login'] = false ;
 
+        }
         $('#regDialog').dialog({
             title: 'registration',
             width: 500,
@@ -48,7 +64,7 @@ function RegistrationForm(authorizationObj) {
             beforeClose: function (event, ui) {
                 paramSet.currentForm = '' ;                // текущую форма - пусто
                 var name = authorizationVect['login'];
-                if (!regSuccessful) {
+                if (!regSuccessful && (currentAction !== ACTION_CHANGE_PASSWORD)) {
                     authorizationVect['login'] = 'noName';
                     authorizationVect['guest'] = true;
                     paramSet.setUser(authorizationVect);
@@ -78,7 +94,7 @@ function RegistrationForm(authorizationObj) {
             minLength: 0
         });
         $loginElem.focus(function() {
-            if (regSuccessful) {
+            if (regSuccessful || currentAction == ACTION_CHANGE_PASSWORD ) {
                 $loginElem.attr('readonly','readonly') ;
                 return ;
             }
@@ -87,8 +103,12 @@ function RegistrationForm(authorizationObj) {
             $passwordDublElem.attr('readonly','readonly') ;
         }) ;
         $loginElem.blur(function(){
-            if (regSuccessful) {
+            if (regSuccessful || currentAction == ACTION_CHANGE_PASSWORD) {
                 $loginElem.attr('readonly','readonly') ;
+                if (currentAction == ACTION_CHANGE_PASSWORD) {
+                    $passwordElem.removeAttr('readonly') ;
+                    $passwordElem.focus() ;
+                }
                 return ;
             }
             var syntaxErr = checkService.syntaxChecking('login') ;
@@ -146,8 +166,12 @@ function RegistrationForm(authorizationObj) {
             }
         }) ;
         _this.formShow() ;        // выводит элементы по текущему языку
-//        $messageText.empty();
-        $loginElem.focus() ;
+        if (currentAction == ACTION_CHANGE_PASSWORD) {
+            $passwordElem.removeAttr('readonly') ;
+            $passwordElem.focus() ;
+        } else {
+            $loginElem.focus();
+        }
     };
     /**
      * вычисляет набор командных кнопок в зависимости от полноты заполнения
@@ -212,7 +236,8 @@ function RegistrationForm(authorizationObj) {
             return ;
         }
         // ошибок заполнения нет !! -> контроль в БД 
-        authorizationVect['newName'] = true;
+        authorizationVect['newName'] = false ;
+        authorizationVect['newPassword'] = (currentAction == ACTION_CHANGE_PASSWORD) ;
         authorizationVect['guest'] = false ;
         authorizationVect['login'] = $loginElem.val();
         authorizationVect['password'] = $passwordElem.val();
@@ -243,10 +268,13 @@ function RegistrationForm(authorizationObj) {
                 }
          }
             if (regSuccessful) {
+                var messId = (currentAction == ACTION_CHANGE_PASSWORD) ? 'changePasswordCompleted' :
+                                                                           'registrationCompleted' ;
                 var message = {'registrationComplete' : {
-                        messageId: 'registrationCompleted'
+                        messageId: messId
                     }
                 };
+
                 checkService.setFieldId('') ;    // чистить полеИд
                 checkService.checkMessage(message,error = false) ;  // сообщение о регистрации
                 $loginElem.attr('readonly','readonly') ;
@@ -274,10 +302,10 @@ function RegistrationForm(authorizationObj) {
      */
    this.formShow = function() {
        checkService.changeLang() ;         // установить язык
-       var title = checkService.getFormTitle() ;
+       var title = checkService.getFormTitle(currentAction) ;
        showTitle(title) ;                     // заголовок формы
        checkService.fieldsLabelShow() ;            // имена полей
-       checkService.descriptionShow() ;      // описатель
+       checkService.descriptionShow(currentAction) ;      // описатель
        commandSet() ;
        checkService.checkMessage() ;
     } ;

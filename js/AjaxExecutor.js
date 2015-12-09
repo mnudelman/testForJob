@@ -15,7 +15,7 @@ function AjaxExecutor(ajaxUrl) {
 
         $('#dbError').append(responseText) ;    // здесь будут необработанные php-ошибки
 
-        var answ  = alert('ERROR: code :'+event.status +' (' + event.statusText+')') ;
+    //    var answ  = alert('ERROR: code :'+event.status +' (' + event.statusText+')') ;
     } ;
     var completeDefault = function() {
         ajaxComplete = true ;
@@ -46,7 +46,8 @@ function AjaxExecutor(ajaxUrl) {
                     requestData = data;
                 }
             }
-        ).error(errorDefault)
+        ).success(function() { ajaxComplete = true ; })
+           .error(errorDefault)
          .complete(completeDefault);
 
     } ;

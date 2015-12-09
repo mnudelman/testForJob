@@ -473,17 +473,23 @@ function CheckService() {
         }
     } ;
     /**
-     * имя формы
+     * Заголовок формы . Если задан actionId, то он используется
+     * как дополнительный уровень при выборе
+     * @param actionId   - фильтр для выбора заголовка
+     *
      * @returns {*}
      */
-    this.getFormTitle = function() {
+    this.getFormTitle = function(actionId) {
+        if (typeof(actionId) == 'string') {
+            return titleTab[actionId][lang] ;
+        }
         return titleTab[lang] ;
     } ;
-    this.descriptionShow = function() {
+    this.descriptionShow = function(actionId) {
         if ($descriptionDiv == undefined) {
             return ;
         }
-        var descriptText = messageTab['description'][lang] ;
+        var descriptText = (typeof(actionId) == 'string') ? messageTab['description'][actionId][lang] :messageTab['description'][lang];
         $descriptionDiv.empty();
         $descriptionDiv.append(descriptText);
     }

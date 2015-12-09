@@ -36,6 +36,7 @@ function EnterForm() {
         login: '',
         password: '',
         newName: false,
+        newPassword: false,
         guest: true,
         successful: false
     };

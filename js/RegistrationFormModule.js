@@ -2,7 +2,12 @@
  * Модуль таблиц для вывода элементов формы на заданном языке
  */
 function RegistrationFormModule() {
-    this.titleTab = {'ru': 'Регистрация', 'en': 'Registration'};
+    //this.titleTab = {'ru': 'Регистрация', 'en': 'Registration'};
+
+    this.titleTab = {
+        'registration': {'ru': 'Регистрация', 'en': 'Registration'},
+        'changePassword': {'ru': 'Замена пароля', 'en': 'Change password'}
+    } ;
     this.fieldTab = {
         'login': {
             labelId: 'regLoginLabel',
@@ -23,28 +28,44 @@ function RegistrationFormModule() {
     this.cmdTab = {
         'cmdProfile': {'ru': 'Профиль', 'en': 'Profile'},
         'cmdBreak': {'ru': 'Прервать', 'en': 'Break'},
-        'cmdOk': {'ru': 'oK!', 'en': 'oK!'}
+        'cmdOk': {'ru': 'oK!', 'en': 'oK!'},
+        'cmdSave' : {'ru': 'сохранить', 'en': 'save'}
     };
 
 
 
     this.messageTab = {
         'description': {
-            'ru': '1.Допустимые символы для заполнения: латинские буквы <strong>a...z(A...Z)</strong>,' +
-            'цифры <strong>0...9</strong>,символ подчёркивания <strong>"_"</strong><br> ' +
-            '2.поле <strong>login</strong> должно быть длиной не менее <strong>6</strong>' +
-            ' символов и не более <strong>20</strong> символов.<br>' +
-            '3.поле <strong>password</strong> должно быть длиной не менее <strong>8</strong> символов и ' +
-            'не более <strong>20</strong> символов<br>' +
-            'в пароле должна быть хотя бы <strong>одна буква</strong> и хотя бы <strong>одна цифра</strong>',
+            'registration': {
+                'ru': '1.Допустимые символы для заполнения: латинские буквы <strong>a...z(A...Z)</strong>,' +
+                'цифры <strong>0...9</strong>,символ подчёркивания <strong>"_"</strong><br> ' +
+                '2.поле <strong>логин</strong> должно быть длиной не менее <strong>6</strong>' +
+                ' символов и не более <strong>20</strong> символов.<br>' +
+                '3.поле <strong>пароль</strong> должно быть длиной не менее <strong>8</strong> символов и ' +
+                'не более <strong>20</strong> символов<br>' +
+                'в пароле должна быть хотя бы <strong>одна буква</strong> и хотя бы <strong>одна цифра</strong>',
 
-            'en': 'Valid characters to fill: latin letters <strong>a...z(A...Z)</strong>,' +
-            'digits <strong>0...9</strong>,the underscore <strong> "_"  </strong> <br> ' +
-            '2.field <strong>login</strong> must be a minimum length of <strong>6</strong>' +
-            ' symbols and no more <strong>20</strong> symbols.<br>' +
-            '3.field <strong>password</strong> must be a minimum length of <strong>8</strong> ' +
-            'symbols and no more <strong>20</strong> symbols<br>' +
-            'your password should be at least  <strong>one letter</strong> and at least<strong>one digit</strong>'
+                'en': 'Valid characters to fill: latin letters <strong>a...z(A...Z)</strong>,' +
+                'digits <strong>0...9</strong>,the underscore <strong> "_"  </strong> <br> ' +
+                '2.field <strong>login</strong> must be a minimum length of <strong>6</strong>' +
+                ' symbols and no more <strong>20</strong> symbols.<br>' +
+                '3.field <strong>password</strong> must be a minimum length of <strong>8</strong> ' +
+                'symbols and no more <strong>20</strong> symbols<br>' +
+                'your password should be at least  <strong>one letter</strong> and at least<strong>one digit</strong>'
+
+            },
+            'changePassword': {
+                'ru': '1.Допустимые символы для заполнения: латинские буквы <strong>a...z(A...Z)</strong>,' +
+                'цифры <strong>0...9</strong>,символ подчёркивания <strong>"_"</strong><br> ' +
+                '2.поле <strong>пароль</strong> должно быть длиной не менее <strong>8</strong> символов и ' +
+                'не более <strong>20</strong> символов<br>' +
+                'в пароле должна быть хотя бы <strong>одна буква</strong> и хотя бы <strong>одна цифра</strong>',
+                'en': 'Valid characters to fill: latin letters <strong>a...z(A...Z)</strong>,' +
+                'digits <strong>0...9</strong>,the underscore <strong> "_"  </strong> <br> ' +
+                '2.field <strong>password</strong> must be a minimum length of <strong>8</strong> ' +
+                'symbols and no more <strong>20</strong> symbols<br>' +
+                'your password should be at least  <strong>one letter</strong> and at least<strong>one digit</strong>'
+            }
         },
         'fieldLengthRange': {
             'ru': 'ОШИБКА: Длина поля(число символов) в интервале <strong>от {lengthMin} до {lengthMax}</strong>',
@@ -64,6 +85,12 @@ function RegistrationFormModule() {
             'en': 'oK! The registration is completed.<br>' +
             'Can go to the <strong>profile</strong> or to do it later'
         },
+        'changePasswordCompleted': {
+            'ru': 'oK! Замена пароля выполнена<br> ' ,
+            'en': 'oK! the password change completed successfully.<br>'
+        },
+
+
         'obligatoryPresenceLetterDigit': {
             'ru': 'ОШИБКА: В пароле должна быть хотя бы <strong>одна буква</strong> и хотя бы <strong>одна цифра</strong>',
             'en': 'ERROR: Your password should be at least  <strong>one letter</strong> and at least<strong>one digit</strong>'

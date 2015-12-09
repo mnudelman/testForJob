@@ -72,9 +72,11 @@ function userLogin()
     $login = $taskPar->getParameter('login') ;             //   $_GET['login'];
     $password = $taskPar->getParameter('password') ;       // $_GET['password'];
     $newNameFlag = $taskPar->getParameter('newName') ;     // $_GET['newName'];
+    $newPassword = $taskPar->getParameter('newPassword') ;
     $successful = false;
     $message = '';
     $newNameFlag = ("false" == $newNameFlag) ? false : true ;
+    $newPasswordFlag = ("false" == $newPassword) ? false : true ;
     $dbAnsw = $dbUser->getUser($login);
     if (false === $dbAnsw) {          // нет в БД
         if ($newNameFlag) {         // добавить в БД
@@ -100,8 +102,18 @@ function userLogin()
                 $msg->addMessage('oK!: Авторизация выполнена') ;
 
             } else {
-                $successful = false;
-                $msg->addMessage('ERROR: Пароль не верен');
+                if (false === $newPasswordFlag) {
+                    $successful = false;
+                    $msg->addMessage('ERROR: Пароль не верен');
+                }else {
+                    $passCode = md5($password) ;
+                    $successful = $dbUser->updatePassword($login,$passCode) ;
+                    if ($successful) {
+                        $msg->addMessage('oK!: Замена пароля выполнена');
+                    }else {
+                        $msg->addMessage('ERROR: Замена пароля НЕ выполнена');
+                    }
+                }
             }
         }
     }
@@ -109,6 +121,7 @@ function userLogin()
         'login' => $login,
         'password' => $password,
         'newName' => $newNameFlag,
+        'newPassword' => $newPasswordFlag,
         'successful' => $successful,
         'message' => $msg->getMessages(),
     ];
