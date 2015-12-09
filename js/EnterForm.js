@@ -278,8 +278,12 @@ function EnterForm() {
 
             error = false;
             var messageLines = [] ;
-            if (typeof(message) == 'string' && message.length > 0 ) {
+            if (typeof(message) == "object" ) {
+                messageLines = message ;
+            } else if (typeof(message) == 'string' && message.length > 0 ) {
                 messageLines[0] = message;
+            }
+            if (typeof(messageLines[0]) == 'string' ) {
                 checkService.setFieldId('');    // чистить полеИд
                 checkService.messagesShow(messageLines, error);   // ответ БД - прямой текст
             }

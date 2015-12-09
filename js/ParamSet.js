@@ -8,6 +8,8 @@ function ParamSet() {
     this.windowLocationHost ;    // http - адрес для доступа к php-модулям БД
     this.dirImages ;
     this.dirHtmlFotos ;              //
+    this.windowLocationHref ;
+
 
     this.ajaxExecute ;   // исполнитель запросов к БД
 
@@ -51,13 +53,15 @@ function ParamSet() {
             path += '/'+arr[i] ;
         }
         _this.winLocation = path ;
+        _this.windowLocationHref = window.location.href ;
         var str = window.location.href ;
-        arr = str.split('/') ;
-        var path = '' ;
-        for (var i = 1; i < arr.length - 1; i++) {
-            path += '/'+arr[i] ;
-        }
-        _this.windowLocationHost = path ;     //     str.replace('/index.html','') ;
+        // в адресе страницы могут появляться лишние символы "#" или "/#" - это происходит
+        // после вызова профиля из меню и загрузки данных через ajax - причина не понятна
+        // поэтому убираю эти символы
+        str = str.replace('/#','') ;
+        str = str.replace('#','') ;
+        str.replace('/index.html','') ;
+        _this.windowLocationHost = str ;     //     str.replace('/index.html','') ;
         var url = _this.windowLocationHost+'/ajaxHost' ;
         _this.ajaxExecute = new AjaxExecutor(url) ;
 //       ---Формы ---------

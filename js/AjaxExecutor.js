@@ -41,7 +41,7 @@ function AjaxExecutor(ajaxUrl) {
        $.getJSON(ajaxUrl+'/index.php',
            sendData,
             function(data) {
-                if ( false == data['successful'] && !ownMessage) {
+                  if ( false == data['successful'] && !ownMessage) {
                     parseError(data,0) ;
                 } else {
                     requestData = data;
