@@ -29,7 +29,6 @@ function EnterForm() {
     var STAT_USER = 10 ; // 'user' ;        // определён как пользователь
     this.formModule = new EnterFormModule() ;     // языковый модуль формы
     var _this = this;
-    var isExistingDialog = false ;           // флаг существования диалога
     // атрибуты авторизации
     var authorizationVect = {
         typ: 'userLogin',
@@ -53,12 +52,7 @@ function EnterForm() {
         checkService.init(_this.formModule,$descriptionText,$messageText) ;
 
         readyStat = STAT_INIT ;                       // начальное состояние
-        if (isExistingDialog)  {
-            _this.currentDialog.dialog('open') ;
-        }else {
             dialogInit();
-            isExistingDialog = true;
-        }
         _this.formShow() ;        // выводит элементы по текущему языку
         $loginElem.focus() ;
     };
@@ -85,6 +79,7 @@ function EnterForm() {
                 }
                 var topMenu = paramSet.topMenu ;
                 topMenu.menuShow() ;        // допустимые действия для пользователя
+   //             $("#login").autocomplete('destroy') ;
             }
         }) ;
 

@@ -52,7 +52,12 @@ function ParamSet() {
         }
         _this.winLocation = path ;
         var str = window.location.href ;
-        _this.windowLocationHost = str.replace('/index.html','') ;
+        arr = str.split('/') ;
+        var path = '' ;
+        for (var i = 1; i < arr.length - 1; i++) {
+            path += '/'+arr[i] ;
+        }
+        _this.windowLocationHost = path ;     //     str.replace('/index.html','') ;
         var url = _this.windowLocationHost+'/ajaxHost' ;
         _this.ajaxExecute = new AjaxExecutor(url) ;
 //       ---Формы ---------

@@ -33,10 +33,14 @@ function LangControl() {
     var showButton = function() {
         var elemBt = $('.'+btClass)[0] ;
         var img = $('.'+btClass +' img')[0] ;
-        var imgSrc = (currentLang == paramSet.LANG_RU) ? paramSet.LANG_IMG_RU : paramSet.LANG_IMG_EN ;
+//        var imgSrc = (currentLang == paramSet.LANG_RU) ? paramSet.LANG_IMG_RU : paramSet.LANG_IMG_EN ;
+        // картинка наоборот ----///
+        var imgSrc = (currentLang == paramSet.LANG_RU) ? paramSet.LANG_IMG_EN : paramSet.LANG_IMG_RU ;
         $(img).attr('src',imgSrc) ;
         $('.'+btClass).empty() ;
         $('.'+btClass).append(img) ;
-        $('.'+btClass).append(currentLang) ;
+        // наоборот  --//
+        var lang = (currentLang == paramSet.LANG_RU) ? paramSet.LANG_EN : paramSet.LANG_RU ;
+        $('.'+btClass).append(lang) ;
     }
 }

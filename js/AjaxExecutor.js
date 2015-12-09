@@ -8,12 +8,12 @@ function AjaxExecutor(ajaxUrl) {
 
 
     var successDefault = function(data,textStatus) {
-        alert('gameSave:status-'+textStatus+' ; hostAnswer:'+data) ;
+        alert('successDefault:status-'+textStatus+' ; hostAnswer:'+data) ;
    } ;
     var errorDefault = function(event, XMLHttpRequest, ajaxOptions, thrownError) {
         var responseText = event.responseText ; // html - page
 
-        $('#dbError').append(responseText) ;    // здесь будут необработанные php-ошибки
+//        $('#dbError').append(responseText) ;    // здесь будут необработанные php-ошибки
 
     //    var answ  = alert('ERROR: code :'+event.status +' (' + event.statusText+')') ;
     } ;
@@ -36,6 +36,7 @@ function AjaxExecutor(ajaxUrl) {
     } ;
     this.getData = function(sendData,ownMessage) {
        ajaxComplete = false ;
+        requestData = false ;
         ownMessage = (ownMessage == undefined) ? false : ownMessage ;
        $.getJSON(ajaxUrl+'/index.php',
            sendData,
@@ -46,8 +47,7 @@ function AjaxExecutor(ajaxUrl) {
                     requestData = data;
                 }
             }
-        ).success(function() { ajaxComplete = true ; })
-           .error(errorDefault)
+        ).error(errorDefault)
          .complete(completeDefault);
 
     } ;

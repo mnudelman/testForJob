@@ -41,7 +41,8 @@ function RegistrationFormModule() {
                 'цифры <strong>0...9</strong>,символ подчёркивания <strong>"_"</strong><br> ' +
                 '2.поле <strong>логин</strong> должно быть длиной не менее <strong>6</strong>' +
                 ' символов и не более <strong>20</strong> символов.<br>' +
-                '3.поле <strong>пароль</strong> должно быть длиной не менее <strong>8</strong> символов и ' +
+                '3.поле <strong>парольq' +
+                '</strong> должно быть длиной не менее <strong>8</strong> символов и ' +
                 'не более <strong>20</strong> символов<br>' +
                 'в пароле должна быть хотя бы <strong>одна буква</strong> и хотя бы <strong>одна цифра</strong>',
 
