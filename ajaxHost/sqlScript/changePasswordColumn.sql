@@ -1,0 +1,1 @@
+alter table users MODIFY COLUMN  password VARCHAR(255) ;

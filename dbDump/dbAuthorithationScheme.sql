@@ -7,7 +7,7 @@
 CREATE TABLE IF NOT EXISTS users (
   userid   INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
   login    VARCHAR(20) UNIQUE,
-  password CHAR(32)
+  password CHAR(255)                  -- использование password_hash(password,PASSWORD_DEFAULT)
 )DEFAULT CHARSET=utf8 ;
 -- --------------------------------------
 -- userprofile - Профиль пользователя

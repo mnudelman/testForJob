@@ -60,7 +60,7 @@ function ParamSet() {
         // поэтому убираю эти символы
         str = str.replace('/#','') ;
         str = str.replace('#','') ;
-        str.replace('/index.html','') ;
+        str = str.replace('/index.html','') ;
         _this.windowLocationHost = str ;     //     str.replace('/index.html','') ;
         var url = _this.windowLocationHost+'/ajaxHost' ;
         _this.ajaxExecute = new AjaxExecutor(url) ;
