@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS userprofile (
   name       VARCHAR(40) DEFAULT '',
   patronymic VARCHAR(40) DEFAULT '',
   filePhoto   VARCHAR(100) DEFAULT '', -- файл с фотографией
-  tel        VARCHAR(15) DEFAULT '',
+  tel        VARCHAR(15) DEFAULT '',sudo
   email      VARCHAR(40) DEFAULT '',
   sex        CHAR(1)           DEFAULT 'm',
   birthday   DATE DEFAULT '2001-01-01',
