@@ -14,6 +14,7 @@ include_once __DIR__ . '/userLogin.php';
 include_once __DIR__ . '/nameList.php';
 include_once __DIR__ . '/getProfile.php';
 include_once __DIR__ . '/setProfile.php';
+include_once __DIR__ . '/MessageOut.php';
 // загружаем параметры---//
 $taskPar = TaskParameters::getInstance() ;
 $taskPar->setParameters($_GET,$_POST) ;

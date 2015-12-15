@@ -40,6 +40,7 @@ function RegistrationForm(authorizationObj) {
    // открыть
     // ---------------------
     this.edit = function (action) {
+        regSuccessful = false ;
         action = (action == undefined) ? ACTION_REGISTRATION : action ;
         currentAction = action ;
         profileForm  = paramSet.profileForm ;          // профиль
@@ -236,7 +237,7 @@ function RegistrationForm(authorizationObj) {
             return ;
         }
         // ошибок заполнения нет !! -> контроль в БД 
-        authorizationVect['newName'] = false ;
+        authorizationVect['newName'] = (currentAction == ACTION_REGISTRATION) ;
         authorizationVect['newPassword'] = (currentAction == ACTION_CHANGE_PASSWORD) ;
         authorizationVect['guest'] = false ;
         authorizationVect['login'] = $loginElem.val();
@@ -285,11 +286,7 @@ function RegistrationForm(authorizationObj) {
                 topMenu.showUser() ;
             }else {                         // сообщения БД прямой текст
                 var err = true ;
-                var messageLines = [] ;
-                messageLines[0] = message ;
-                checkService.setFieldId('') ;    // чистить полеИд
-                checkService.messagesShow(messageLines,err) ;   // прямой вывод текста
-
+                checkService.dbMessageShow(message,err) ;
                 $loginElem.removeAttr('readonly') ;
                 $loginElem.focus() ;
             }
@@ -308,6 +305,7 @@ function RegistrationForm(authorizationObj) {
        checkService.descriptionShow(currentAction) ;      // описатель
        commandSet() ;
        checkService.checkMessage() ;
+       checkService.dbMessageShow() ;
     } ;
     /**
      * Вывод заголовка

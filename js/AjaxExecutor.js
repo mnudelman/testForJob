@@ -5,7 +5,7 @@
 function AjaxExecutor(ajaxUrl) {
    var requestData = false ;                 // результат запроса
    var ajaxComplete = false ;
-
+   var debugFlag =  false ;                   // отладка запроса
 
     var successDefault = function(data,textStatus) {
         alert('successDefault:status-'+textStatus+' ; hostAnswer:'+data) ;
@@ -13,9 +13,8 @@ function AjaxExecutor(ajaxUrl) {
     var errorDefault = function(event, XMLHttpRequest, ajaxOptions, thrownError) {
         var responseText = event.responseText ; // html - page
 
-//        $('#dbError').append(responseText) ;    // здесь будут необработанные php-ошибки
-
-    //    var answ  = alert('ERROR: code :'+event.status +' (' + event.statusText+')') ;
+        $('#dbError').append(responseText) ;    // здесь будут необработанные php-ошибки
+   //    var answ  = alert('ERROR: code :'+event.status +' (' + event.statusText+')') ;
     } ;
     var completeDefault = function() {
         ajaxComplete = true ;
@@ -41,9 +40,12 @@ function AjaxExecutor(ajaxUrl) {
        $.getJSON(ajaxUrl+'/index.php',
            sendData,
             function(data) {
-                  if ( false == data['successful'] && !ownMessage) {
+                  if (false == data['successful'] && !ownMessage) {
                     parseError(data,0) ;
                 } else {
+                      if (debugFlag) {
+                          parseError(data, 0);
+                      }
                     requestData = data;
                 }
             }

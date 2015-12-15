@@ -45,6 +45,10 @@ function EnterFormModule() {
         'noAnswerFromDB': {
             'ru': 'ОШИБКА: Нет ответа от базы данных.',
             'en': 'ERROR: No answer from the database.'
+        },
+        'DBMessage': {                                    // возможное сообщение от БД
+            'ru': '',
+            'en': ''
         }
     };
     this.fieldRules = {

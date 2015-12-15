@@ -17,10 +17,12 @@ function CheckService() {
     var currentFieldId ;            // контролируемое поле
     var currentMessages = {} ;      // сообщения
     var currentError = {} ;         // наличие ошибки контроля
+    var currentDbMessage = {} ;     // сообщение от БД
     //---------------------------------------------------------
     var MESSAGE_ERROR_CSS = 'messageError' ;   //  класс для вывода ошибок
     var MESSAGE_INFO_CSS = 'messageInfo' ;     //  класс для вывода информационных сообщений
     //---------------------------------------------------------
+    var DB_MESSAGE_ID = 'dbMessage' ;          // id сообщений от БД
     var _this = this ;
     //---------------------------------------------------------
     /**
@@ -492,6 +494,37 @@ function CheckService() {
         var descriptText = (typeof(actionId) == 'string') ? messageTab['description'][actionId][lang] :messageTab['description'][lang];
         $descriptionDiv.empty();
         $descriptionDiv.append(descriptText);
+    } ;
+    /**
+     * сообщения от БД
+     * в перемешку идут простые текстовые сообщения и объекты вида {en: '...' , ru: '...' }
+     * @param dbMessages
+     */
+    this.dbMessageShow = function(dbMessages,error) {
+        if (dbMessages == undefined) {
+            dbMessages = currentDbMessage ;
+            error = currentError['dbError']  ;
+        }
+        if (error == undefined) {
+            error = false ;
+        }
+        for (var i = 0; i < dbMessages.length; i++ ) {
+            var dbMess = dbMessages[i] ;
+            if (typeof(dbMess) == 'string') {
+                _this.messagesShow([dbMess],error) ;
+            }
+            if (typeof(dbMess['ru']) == 'string') {
+                messageTab[DB_MESSAGE_ID] = dbMess ;
+                var messObj = {
+                    'dbMessage' : {
+                        'messageId': DB_MESSAGE_ID
+                    }
+                } ;
+                _this.checkMessage(messObj,error) ;
+            }
+        }
+        currentError['dbError'] = error ;
+        currentDbMessage = dbMessages ;
     }
 
 

@@ -27,13 +27,19 @@ class MessageOut {
         $enValue = '' ;    // сообщение на английском
         $ruValue = '' ;    // сообщение на русском
         foreach ($this->messages as $messId => $mesValue) {
-            $enValue = $this->messageSubst($enValue) ;
-            $ruValue = $this->messageSubst($ruValue) ;
+            $enValue = $this->messageSubst($mesValue['en']) ;
+            $ruValue = $this->messageSubst($mesValue['ru']) ;
             $this->messOut[$messId] =
                 ['ru' => $ruValue,
                  'en' => $enValue] ;
         }
     }
+
+    /**
+     * подстановка параметров в конкретный текст сообщения
+     * @param $messText
+     * @return string
+     */
     private function messageSubst($messText) {
         $leftBrace = '{' ;
         $rightBrace = '}' ;
@@ -46,8 +52,8 @@ class MessageOut {
             }
             $rightPart = substr($messText,$posEnd+1) ;
 
-            $parName = trim(substr($messText,$posBeg + 1,$posEnd - $posBeg + 1)) ;
-            $parValue = ((isset($subst[$parName])) ? $subst[$parName] : '!'.$parName.'!').''  ;
+            $parName = trim(substr($messText,$posBeg + 1,$posEnd - $posBeg-1)) ;
+            $parValue = ((isset($this->subst[$parName])) ? $this->subst[$parName] : '!'.$parName.'!').''  ;
             $messText = $leftPart.$parValue.$rightPart ;
         }
         return $messText ;
@@ -60,5 +66,8 @@ class MessageOut {
      */
     public function getMessage($messId) {
         return (isset($this->messOut[$messId])) ? $this->messOut[$messId] : $messId ;
+    }
+    public function getMessOut() {
+        return $this->messOut ;
     }
 }
