@@ -36,6 +36,7 @@ function CheckService() {
         $descriptionDiv = $descDiv;
         $messageDiv = $messDiv;
         currentMessages = {} ;
+        currentDbMessage = {} ;
         currentError = {} ;
         currentFieldId = undefined ;
         $messageDiv.empty() ;
